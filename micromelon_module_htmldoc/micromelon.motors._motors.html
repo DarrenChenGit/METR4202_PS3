@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html ><head ><title >Python: module micromelon.motors._motors</title>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+</head><body bgcolor="#f0f0f8" >
+
+<table cellpadding="2" width="100%" border="0" cellspacing="0" summary="heading" >
+<tr bgcolor="#7799ee" >
+<td valign="bottom" >&nbsp;<br />
+<font color="#ffffff" face="helvetica, arial" >&nbsp;<br /><big ><big ><strong ><a href="micromelon.html" ><font color="#ffffff" >micromelon</font></a>.<a href="micromelon.motors.html" ><font color="#ffffff" >motors</font></a>._motors</strong></big></big></font></td><td align="right" valign="bottom" ><font color="#ffffff" face="helvetica, arial" ><a href="micromelon.html" >index</a></font></td></tr></table>
+    <p ></p>
+<p >
+<table cellpadding="2" width="100%" border="0" cellspacing="0" summary="section" >
+<tr bgcolor="#aa55cc" >
+<td colspan="3" valign="bottom" >&nbsp;<br />
+<font color="#ffffff" face="helvetica, arial" ><big ><strong >Modules</strong></big></font></td></tr>
+    
+<tr ><td bgcolor="#aa55cc" ><tt >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td >&nbsp;</td>
+<td width="100%" ><table width="100%" summary="list" ><tr ><td width="25%" valign="top" ><a href="math.html" >math</a><br />
+</td><td width="25%" valign="top" ><a href="time.html" >time</a><br />
+</td><td width="25%" valign="top" ></td><td width="25%" valign="top" ></td></tr></table></td></tr></table><p >
+<table cellpadding="2" width="100%" border="0" cellspacing="0" summary="section" >
+<tr bgcolor="#eeaa77" >
+<td colspan="3" valign="bottom" >&nbsp;<br />
+<font color="#ffffff" face="helvetica, arial" ><big ><strong >Functions</strong></big></font></td></tr>
+    
+<tr ><td bgcolor="#eeaa77" ><tt >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td >&nbsp;</td>
+<td width="100%" ><dl ><dt ><a name="-moveDistance" ><strong >moveDistance</strong></a>(lDist, lSpeed=15, rDist=None, rSpeed=None, syncStop=False)</dt><dd ><tt >Drives&nbsp;each&nbsp;side&nbsp;of&nbsp;the&nbsp;robot&nbsp;by&nbsp;the&nbsp;distances&nbsp;and&nbsp;speeds&nbsp;specified.<br />
+&nbsp;&nbsp;Distances&nbsp;must&nbsp;be&nbsp;a&nbsp;number&nbsp;of&nbsp;cm.<br />
+&nbsp;&nbsp;Speed&nbsp;is&nbsp;an&nbsp;optional&nbsp;argument&nbsp;and&nbsp;defaults&nbsp;to&nbsp;15.<br />
+&nbsp;&nbsp;If&nbsp;right&nbsp;values&nbsp;aren't&nbsp;given&nbsp;then&nbsp;they&nbsp;default&nbsp;to&nbsp;the&nbsp;same&nbsp;as&nbsp;the&nbsp;left<br />
+&nbsp;&nbsp;If&nbsp;syncstop&nbsp;is&nbsp;true&nbsp;then&nbsp;both&nbsp;motors&nbsp;will&nbsp;be&nbsp;stopped&nbsp;as&nbsp;soon&nbsp;as&nbsp;one&nbsp;has&nbsp;finished&nbsp;its&nbsp;distance&nbsp;operation</tt></dd></dl>
+ <dl ><dt ><a name="-setDegreesOffset" ><strong >setDegreesOffset</strong></a>(offset)</dt><dd ><tt >Applies&nbsp;this&nbsp;number&nbsp;as&nbsp;a&nbsp;difference&nbsp;to&nbsp;all&nbsp;degrees&nbsp;arguments&nbsp;in&nbsp;the&nbsp;Motor&nbsp;control&nbsp;functions.<br />
+If&nbsp;it&nbsp;is&nbsp;big&nbsp;enough&nbsp;to&nbsp;change&nbsp;the&nbsp;sign&nbsp;of&nbsp;degrees&nbsp;it&nbsp;will&nbsp;not&nbsp;be&nbsp;applied.</tt></dd></dl>
+ <dl ><dt ><a name="-stop" ><strong >stop</strong></a>()</dt><dd ><tt >Stops&nbsp;left&nbsp;and&nbsp;right&nbsp;motors</tt></dd></dl>
+ <dl ><dt ><a name="-turn" ><strong >turn</strong></a>(speed, secs=None, radius=0, reverse=False)</dt><dd ><tt >Makes&nbsp;the&nbsp;robot&nbsp;turn&nbsp;at&nbsp;the&nbsp;specified&nbsp;speed&nbsp;for&nbsp;the&nbsp;specified&nbsp;number&nbsp;of&nbsp;seconds.<br />
+&nbsp;&nbsp;If&nbsp;seconds&nbsp;isn't&nbsp;specified&nbsp;it&nbsp;will&nbsp;return&nbsp;immediately&nbsp;and&nbsp;leave&nbsp;the&nbsp;motors&nbsp;turning.<br />
+&nbsp;&nbsp;Speeds&nbsp;are&nbsp;cm/s&nbsp;must&nbsp;be&nbsp;between&nbsp;-30&nbsp;and&nbsp;30&nbsp;inclusive.&nbsp;Negative&nbsp;speed&nbsp;is&nbsp;a&nbsp;left&nbsp;turn.<br />
+&nbsp;&nbsp;By&nbsp;default&nbsp;it&nbsp;turns&nbsp;on&nbsp;the&nbsp;spot,&nbsp;but&nbsp;a&nbsp;radius&nbsp;in&nbsp;cm&nbsp;can&nbsp;be&nbsp;specified.</tt></dd></dl>
+ <dl ><dt ><a name="-turnDegrees" ><strong >turnDegrees</strong></a>(degrees, speed=15, radius=0, reverse=False)</dt><dd ><tt >Turns&nbsp;the&nbsp;robot&nbsp;by&nbsp;the&nbsp;specified&nbsp;number&nbsp;of&nbsp;degrees.<br />
+&nbsp;&nbsp;Speed&nbsp;must&nbsp;be&nbsp;between&nbsp;-30&nbsp;and&nbsp;30&nbsp;(cm/s)&nbsp;inclusive.<br />
+&nbsp;&nbsp;Negative&nbsp;speed&nbsp;is&nbsp;a&nbsp;left&nbsp;turn.<br />
+&nbsp;&nbsp;If&nbsp;no&nbsp;degrees&nbsp;is&nbsp;specified&nbsp;the&nbsp;robot&nbsp;will&nbsp;turn&nbsp;indefinitely,&nbsp;otherwise&nbsp;it&nbsp;will&nbsp;stop&nbsp;after&nbsp;turning&nbsp;the&nbsp;specified&nbsp;number&nbsp;of&nbsp;degrees.<br />
+&nbsp;&nbsp;By&nbsp;default&nbsp;it&nbsp;turns&nbsp;on&nbsp;the&nbsp;spot,&nbsp;but&nbsp;a&nbsp;radius&nbsp;in&nbsp;cm&nbsp;can&nbsp;be&nbsp;specified.</tt></dd></dl>
+ <dl ><dt ><a name="-write" ><strong >write</strong></a>(left, right=None, secs=0)</dt><dd ><tt >Speeds&nbsp;must&nbsp;be&nbsp;between&nbsp;-30&nbsp;and&nbsp;30&nbsp;(cm/s).<br />
+If&nbsp;only&nbsp;one&nbsp;argument&nbsp;is&nbsp;given&nbsp;then&nbsp;both&nbsp;motors&nbsp;will&nbsp;be&nbsp;set&nbsp;to&nbsp;the&nbsp;same&nbsp;speed.<br />
+Seconds&nbsp;is&nbsp;an&nbsp;optional&nbsp;argument,&nbsp;without&nbsp;it&nbsp;the&nbsp;function&nbsp;returns&nbsp;immediately&nbsp;<br />
+&nbsp;&nbsp;and&nbsp;the&nbsp;motors&nbsp;will&nbsp;stay&nbsp;at&nbsp;the&nbsp;set&nbsp;speed&nbsp;until&nbsp;explicitly&nbsp;changed.<br />
+&nbsp;&nbsp;If&nbsp;it's&nbsp;included&nbsp;then&nbsp;this&nbsp;is&nbsp;a&nbsp;blocking&nbsp;function&nbsp;and&nbsp;<br />
+&nbsp;&nbsp;the&nbsp;motors&nbsp;will&nbsp;run&nbsp;at&nbsp;the&nbsp;specified&nbsp;speeds&nbsp;for&nbsp;that&nbsp;many&nbsp;seconds&nbsp;and&nbsp;then&nbsp;stop.</tt></dd></dl>
+</td></tr></table><p >
+<table cellpadding="2" width="100%" border="0" cellspacing="0" summary="section" >
+<tr bgcolor="#55aa55" >
+<td colspan="3" valign="bottom" >&nbsp;<br />
+<font color="#ffffff" face="helvetica, arial" ><big ><strong >Data</strong></big></font></td></tr>
+    
+<tr ><td bgcolor="#55aa55" ><tt >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td >&nbsp;</td>
+<td width="100%" ><strong >__all__</strong> = ['write', 'stop', 'moveDistance', 'turn', 'turnDegrees', 'setDegreesOffset']</td></tr></table>
+</p></p></p></body></html>

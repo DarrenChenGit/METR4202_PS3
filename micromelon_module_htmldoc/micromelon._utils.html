@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html ><head ><title >Python: module micromelon._utils</title>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+</head><body bgcolor="#f0f0f8" >
+
+<table cellpadding="2" width="100%" border="0" cellspacing="0" summary="heading" >
+<tr bgcolor="#7799ee" >
+<td valign="bottom" >&nbsp;<br />
+<font color="#ffffff" face="helvetica, arial" >&nbsp;<br /><big ><big ><strong ><a href="micromelon.html" ><font color="#ffffff" >micromelon</font></a>._utils</strong></big></big></font></td><td align="right" valign="bottom" ><font color="#ffffff" face="helvetica, arial" ><a href="micromelon.html" >index</a></font></td></tr></table>
+    <p ></p>
+<p >
+<table cellpadding="2" width="100%" border="0" cellspacing="0" summary="section" >
+<tr bgcolor="#eeaa77" >
+<td colspan="3" valign="bottom" >&nbsp;<br />
+<font color="#ffffff" face="helvetica, arial" ><big ><strong >Functions</strong></big></font></td></tr>
+    
+<tr ><td bgcolor="#eeaa77" ><tt >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td >&nbsp;</td>
+<td width="100%" ><dl ><dt ><a name="-constrain" ><strong >constrain</strong></a>(x, low, high)</dt><dd ><tt >Returns&nbsp;x&nbsp;clamped&nbsp;to&nbsp;between&nbsp;low&nbsp;and&nbsp;high&nbsp;inclusive</tt></dd></dl>
+ <dl ><dt ><a name="-isBetween" ><strong >isBetween</strong></a>(x, low, high)</dt><dd ><tt >Returns&nbsp;true&nbsp;iff&nbsp;x&nbsp;is&nbsp;between&nbsp;low&nbsp;and&nbsp;high&nbsp;inclusive<br />
+Returns&nbsp;false&nbsp;otherwise</tt></dd></dl>
+ <dl ><dt ><a name="-isNumber" ><strong >isNumber</strong></a>(x)</dt></dl>
+ <dl ><dt ><a name="-numberToByteArray" ><strong >numberToByteArray</strong></a>(n, byteCount=None)</dt></dl>
+ <dl ><dt ><a name="-restrictDistance" ><strong >restrictDistance</strong></a>(dist)</dt><dd ><tt >#&nbsp;Distance&nbsp;given&nbsp;in&nbsp;cm&nbsp;returns&nbsp;errors&nbsp;or&nbsp;distance&nbsp;in&nbsp;mm</tt></dd></dl>
+ <dl ><dt ><a name="-restrictRadius" ><strong >restrictRadius</strong></a>(r)</dt><dd ><tt >#&nbsp;Returns&nbsp;time&nbsp;in&nbsp;seconds&nbsp;if&nbsp;it's&nbsp;a&nbsp;valid&nbsp;number</tt></dd></dl>
+ <dl ><dt ><a name="-restrictServoDegrees" ><strong >restrictServoDegrees</strong></a>(d)</dt></dl>
+ <dl ><dt ><a name="-restrictSpeed" ><strong >restrictSpeed</strong></a>(speed)</dt><dd ><tt >#&nbsp;Speed&nbsp;should&nbsp;be&nbsp;in&nbsp;cm/s&nbsp;with&nbsp;a&nbsp;maximum&nbsp;of&nbsp;30</tt></dd></dl>
+ <dl ><dt ><a name="-restrictTime" ><strong >restrictTime</strong></a>(secs)</dt><dd ><tt >#&nbsp;Returns&nbsp;time&nbsp;in&nbsp;seconds&nbsp;if&nbsp;it's&nbsp;a&nbsp;valid&nbsp;number</tt></dd></dl>
+ <dl ><dt ><a name="-scale" ><strong >scale</strong></a>(x, xmin, xmax, newMin, newMax)</dt><dd ><tt >Returns&nbsp;x&nbsp;scaled&nbsp;from&nbsp;the&nbsp;range&nbsp;xmin&nbsp;-&nbsp;xmax&nbsp;to&nbsp;the&nbsp;range&nbsp;newMin&nbsp;-&nbsp;newMax<br />
+Output&nbsp;is&nbsp;restricted&nbsp;to&nbsp;between&nbsp;newMin&nbsp;and&nbsp;newMax&nbsp;inclusive<br />
+If&nbsp;newMin&nbsp;is&nbsp;greater&nbsp;than&nbsp;newMax&nbsp;or&nbsp;xmin&nbsp;is&nbsp;greater&nbsp;than&nbsp;xmax<br />
+it&nbsp;will&nbsp;be&nbsp;treated&nbsp;and&nbsp;inversely&nbsp;proportional</tt></dd></dl>
+</td></tr></table><p >
+<table cellpadding="2" width="100%" border="0" cellspacing="0" summary="section" >
+<tr bgcolor="#55aa55" >
+<td colspan="3" valign="bottom" >&nbsp;<br />
+<font color="#ffffff" face="helvetica, arial" ><big ><strong >Data</strong></big></font></td></tr>
+    
+<tr ><td bgcolor="#55aa55" ><tt >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td >&nbsp;</td>
+<td width="100%" ><strong >MAX_DISTANCE</strong> = 3276.7<br />
+<strong >MAX_SERVO_DEGREES</strong> = 90<br />
+<strong >MAX_SPEED</strong> = 30<br />
+<strong >MAX_TIME</strong> = 120</td></tr></table>
+</p></p></body></html>

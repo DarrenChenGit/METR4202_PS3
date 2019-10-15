@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html ><head ><title >Python: module micromelon.i2c._i2c</title>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+</head><body bgcolor="#f0f0f8" >
+
+<table cellpadding="2" width="100%" border="0" cellspacing="0" summary="heading" >
+<tr bgcolor="#7799ee" >
+<td valign="bottom" >&nbsp;<br />
+<font color="#ffffff" face="helvetica, arial" >&nbsp;<br /><big ><big ><strong ><a href="micromelon.html" ><font color="#ffffff" >micromelon</font></a>.<a href="micromelon.i2c.html" ><font color="#ffffff" >i2c</font></a>._i2c</strong></big></big></font></td><td align="right" valign="bottom" ><font color="#ffffff" face="helvetica, arial" ><a href="micromelon.html" >index</a></font></td></tr></table>
+    <p ></p>
+<p >
+<table cellpadding="2" width="100%" border="0" cellspacing="0" summary="section" >
+<tr bgcolor="#eeaa77" >
+<td colspan="3" valign="bottom" >&nbsp;<br />
+<font color="#ffffff" face="helvetica, arial" ><big ><strong >Functions</strong></big></font></td></tr>
+    
+<tr ><td bgcolor="#eeaa77" ><tt >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td >&nbsp;</td>
+<td width="100%" ><dl ><dt ><a name="-read" ><strong >read</strong></a>(address, register, byteCount, addressIs7Bit=True)</dt><dd ><tt >Reads&nbsp;the&nbsp;specified&nbsp;number&nbsp;of&nbsp;bytes&nbsp;from&nbsp;the&nbsp;register&nbsp;of&nbsp;the&nbsp;device<br />
+at&nbsp;the&nbsp;given&nbsp;address.<br />
+&nbsp;&nbsp;If&nbsp;fourth&nbsp;argument&nbsp;is&nbsp;True&nbsp;then&nbsp;address&nbsp;will&nbsp;be&nbsp;treated&nbsp;as&nbsp;7&nbsp;bits<br />
+&nbsp;&nbsp;and&nbsp;is&nbsp;shifted&nbsp;right&nbsp;one&nbsp;bit&nbsp;and&nbsp;then&nbsp;the&nbsp;R/W&nbsp;bit&nbsp;is&nbsp;set<br />
+&nbsp;&nbsp;Returns&nbsp;array&nbsp;of&nbsp;bytes&nbsp;read&nbsp;from&nbsp;the&nbsp;address</tt></dd></dl>
+ <dl ><dt ><a name="-scan" ><strong >scan</strong></a>()</dt><dd ><tt >Scans&nbsp;for&nbsp;any&nbsp;I2C&nbsp;devices&nbsp;connected&nbsp;to&nbsp;the&nbsp;expansion&nbsp;header<br />
+&nbsp;&nbsp;Returns&nbsp;an&nbsp;array&nbsp;of&nbsp;devices&nbsp;addresses&nbsp;found.&nbsp;&nbsp;Empty&nbsp;array&nbsp;if&nbsp;none&nbsp;found</tt></dd></dl>
+ <dl ><dt ><a name="-write" ><strong >write</strong></a>(address, register, value, byteCount, addressIs7Bit=True)</dt><dd ><tt >Writes&nbsp;the&nbsp;specified&nbsp;data&nbsp;(value)&nbsp;to&nbsp;the&nbsp;register&nbsp;of&nbsp;the&nbsp;device&nbsp;at&nbsp;the&nbsp;given&nbsp;address.<br />
+&nbsp;&nbsp;If&nbsp;fifth&nbsp;argument&nbsp;is&nbsp;True&nbsp;then&nbsp;address&nbsp;will&nbsp;be&nbsp;treated&nbsp;as&nbsp;7&nbsp;bits<br />
+&nbsp;&nbsp;and&nbsp;is&nbsp;shifted&nbsp;right&nbsp;one&nbsp;bit</tt></dd></dl>
+</td></tr></table><p >
+<table cellpadding="2" width="100%" border="0" cellspacing="0" summary="section" >
+<tr bgcolor="#55aa55" >
+<td colspan="3" valign="bottom" >&nbsp;<br />
+<font color="#ffffff" face="helvetica, arial" ><big ><strong >Data</strong></big></font></td></tr>
+    
+<tr ><td bgcolor="#55aa55" ><tt >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td >&nbsp;</td>
+<td width="100%" ><strong >__all__</strong> = ['read', 'write', 'scan']</td></tr></table>
+</p></p></body></html>

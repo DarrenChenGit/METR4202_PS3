@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html ><head ><title >Python: module micromelon._rover_controller</title>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+</head><body bgcolor="#f0f0f8" >
+
+<table cellpadding="2" width="100%" border="0" cellspacing="0" summary="heading" >
+<tr bgcolor="#7799ee" >
+<td valign="bottom" >&nbsp;<br />
+<font color="#ffffff" face="helvetica, arial" >&nbsp;<br /><big ><big ><strong ><a href="micromelon.html" ><font color="#ffffff" >micromelon</font></a>._rover_controller</strong></big></big></font></td><td align="right" valign="bottom" ><font color="#ffffff" face="helvetica, arial" ><a href="micromelon.html" >index</a></font></td></tr></table>
+    <p ></p>
+<p >
+<table cellpadding="2" width="100%" border="0" cellspacing="0" summary="section" >
+<tr bgcolor="#aa55cc" >
+<td colspan="3" valign="bottom" >&nbsp;<br />
+<font color="#ffffff" face="helvetica, arial" ><big ><strong >Modules</strong></big></font></td></tr>
+    
+<tr ><td bgcolor="#aa55cc" ><tt >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td >&nbsp;</td>
+<td width="100%" ><table width="100%" summary="list" ><tr ><td width="25%" valign="top" ><a href="math.html" >math</a><br />
+<a href="serial.html" >serial</a><br />
+</td><td width="25%" valign="top" ><a href="signal.html" >signal</a><br />
+<a href="sys.html" >sys</a><br />
+</td><td width="25%" valign="top" ><a href="time.html" >time</a><br />
+</td><td width="25%" valign="top" ></td></tr></table></td></tr></table><p >
+<table cellpadding="2" width="100%" border="0" cellspacing="0" summary="section" >
+<tr bgcolor="#ee77aa" >
+<td colspan="3" valign="bottom" >&nbsp;<br />
+<font color="#ffffff" face="helvetica, arial" ><big ><strong >Classes</strong></big></font></td></tr>
+    
+<tr ><td bgcolor="#ee77aa" ><tt >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td >&nbsp;</td>
+<td width="100%" ><dl >
+<dt ><font face="helvetica, arial" ><a href="builtins.html#object" >builtins.object</a>
+</font></dt><dd >
+<dl >
+<dt ><font face="helvetica, arial" ><a href="micromelon._rover_controller.html#RoverController" >RoverController</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p >
+<table cellpadding="2" width="100%" border="0" cellspacing="0" summary="section" >
+<tr bgcolor="#ffc8d8" >
+<td colspan="3" valign="bottom" >&nbsp;<br />
+<font color="#000000" face="helvetica, arial" ><a name="RoverController" >class <strong >RoverController</strong></a>(<a href="builtins.html#object" >builtins.object</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8" ><td rowspan="2" ><tt >&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan="2" ><tt ><a href="#RoverController" >RoverController</a>(*args,&nbsp;**kwargs)<br />
+&nbsp;<br />
+Manages&nbsp;connection&nbsp;and&nbsp;packet&nbsp;level&nbsp;communication&nbsp;with&nbsp;the&nbsp;robot<br />
+&nbsp;&nbsp;Is&nbsp;a&nbsp;singleton&nbsp;-&nbsp;get&nbsp;a&nbsp;reference&nbsp;to&nbsp;the&nbsp;instance&nbsp;with&nbsp;constructor<br />
+&nbsp;<br />
+&nbsp;&nbsp;standard&nbsp;usage<br />
+&nbsp;&nbsp;rc&nbsp;=&nbsp;<a href="#RoverController" >RoverController</a>()<br />
+&nbsp;&nbsp;rc.<a href="#RoverController-connectSerial" >connectSerial</a>()<br />&nbsp;</tt></td></tr>
+<tr ><td >&nbsp;</td>
+<td width="100%" >Methods defined here:<br />
+<dl ><dt ><a name="RoverController-__init__" ><strong >__init__</strong></a>(self, port=None, bluetooth=False)</dt><dd ><tt >Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</tt></dd></dl>
+
+<dl ><dt ><a name="RoverController-arm" ><strong >arm</strong></a>(self)</dt><dd ><tt >Puts&nbsp;the&nbsp;robot&nbsp;in&nbsp;UART&nbsp;control&nbsp;mode</tt></dd></dl>
+
+<dl ><dt ><a name="RoverController-connectIP" ><strong >connectIP</strong></a>(self, address='192.168.4.1', port=4202)</dt></dl>
+
+<dl ><dt ><a name="RoverController-connectSerial" ><strong >connectSerial</strong></a>(self, newPort='/dev/ttyS0')</dt><dd ><tt >Sets&nbsp;the&nbsp;communcation&nbsp;to&nbsp;use&nbsp;serial<br />
+&nbsp;&nbsp;default&nbsp;port&nbsp;is&nbsp;the&nbsp;gpio&nbsp;serial&nbsp;on&nbsp;a&nbsp;raspberry&nbsp;pi</tt></dd></dl>
+
+<dl ><dt ><a name="RoverController-disarm" ><strong >disarm</strong></a>(self)</dt><dd ><tt >Returns&nbsp;the&nbsp;robot&nbsp;to&nbsp;normal&nbsp;bluetooth&nbsp;operation</tt></dd></dl>
+
+<dl ><dt ><a name="RoverController-isInBluetoothMode" ><strong >isInBluetoothMode</strong></a>(self)</dt></dl>
+
+<dl ><dt ><a name="RoverController-isInNetworkMode" ><strong >isInNetworkMode</strong></a>(self)</dt></dl>
+
+<dl ><dt ><a name="RoverController-readAttribute" ><strong >readAttribute</strong></a>(self, opType, data=[], timeout=None)</dt><dd ><tt >Blocking&nbsp;read&nbsp;-&nbsp;returns&nbsp;the&nbsp;raw&nbsp;data&nbsp;from&nbsp;robot&nbsp;response</tt></dd></dl>
+
+<dl ><dt ><a name="RoverController-readPacket" ><strong >readPacket</strong></a>(self, blocking=False, timeout=None)</dt><dd ><tt >Reads&nbsp;a&nbsp;packet&nbsp;from&nbsp;the&nbsp;transport<br />
+&nbsp;&nbsp;returns&nbsp;packet&nbsp;on&nbsp;success<br />
+&nbsp;&nbsp;returns&nbsp;None&nbsp;if&nbsp;timeout&nbsp;or&nbsp;no&nbsp;packet&nbsp;available&nbsp;on&nbsp;non-blocking</tt></dd></dl>
+
+<dl ><dt ><a name="RoverController-setReadTimeout" ><strong >setReadTimeout</strong></a>(self, seconds=None)</dt><dd ><tt >Timeout&nbsp;used&nbsp;for&nbsp;blocking&nbsp;reads&nbsp;of&nbsp;packets</tt></dd></dl>
+
+<dl ><dt ><a name="RoverController-stopRobot" ><strong >stopRobot</strong></a>(self, waitForAck=False)</dt></dl>
+
+<dl ><dt ><a name="RoverController-waitForPacket" ><strong >waitForPacket</strong></a>(self, opCode, opType, timeout=None)</dt><dd ><tt >Blocks&nbsp;until&nbsp;a&nbsp;packet&nbsp;with&nbsp;a&nbsp;matching&nbsp;header&nbsp;is&nbsp;received<br />
+&nbsp;&nbsp;throws&nbsp;an&nbsp;exception&nbsp;if&nbsp;an&nbsp;invalid&nbsp;or&nbsp;error&nbsp;packet&nbsp;is&nbsp;received</tt></dd></dl>
+
+<dl ><dt ><a name="RoverController-writeAttribute" ><strong >writeAttribute</strong></a>(self, opType, data)</dt><dd ><tt >Writes&nbsp;an&nbsp;attribute&nbsp;and&nbsp;returns&nbsp;once&nbsp;the&nbsp;ACK&nbsp;packet&nbsp;is&nbsp;received&nbsp;from&nbsp;the&nbsp;robot</tt></dd></dl>
+
+<dl ><dt ><a name="RoverController-writePacket" ><strong >writePacket</strong></a>(self, opCode, opType, data=[], waitForAck=True)</dt><dd ><tt >Writes&nbsp;the&nbsp;packet&nbsp;over&nbsp;transport<br />
+Blocks&nbsp;and&nbsp;waits&nbsp;for&nbsp;ack&nbsp;by&nbsp;default</tt></dd></dl>
+
+<hr />
+Data descriptors defined here:<br />
+<dl ><dt ><strong >__dict__</strong></dt>
+<dd ><tt >dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl ><dt ><strong >__weakref__</strong></dt>
+<dd ><tt >list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+</td></tr></table></p></td></tr></table>
+</p></p></body></html>
