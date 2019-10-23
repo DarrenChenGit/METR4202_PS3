@@ -11,23 +11,16 @@ class Map:
         for y in range(0, self.y_length, 1):
             
             for x in range(0, self.x_length, 1):
-                print('|' + str(self.grids[y][x]), end = '');
+                print('|' + str(self.grids[self.y_length - 1 - y][x]), end = '')
             
                 if x == (self.x_length - 1):
-                    print('|');
+                    print('|')
         
                     
-    def mark_location(self, x, y):
-        self.grids[y][x] = '0'
+    def mark_location(self, x, y, icon):
+        self.grids[y][x] = icon
 
-    def mark_relative_location(self, currentX, currentY, distance, angle):
+    def mark_relative_location(self, currentX, currentY, distance, angle, icon):
         locationX = int(currentX + distance*m.cos(angle))
         locationY = int(currentY + distance*m.sin(angle))
-        self.mark_location(locationX, locationY);
-        
-M = Map(50,50)
-M.mark_location(1,1)
-M.mark_location(2,1)
-M.mark_location(3,1)
-M.mark_location(4,1)
-M.display_map()
+        self.mark_location(locationX, locationY, icon)
