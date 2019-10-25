@@ -48,10 +48,10 @@ class myRobot:
             time.sleep(0.6)
 
     def move_forward(self, distance, angle):
-        #Motors.turnDegrees(angle - self.orientation, 5)
-        #time.sleep(3)
-        #Motors.moveDistance(distance)
-        #time.sleep(distance/15 + 1)
+        Motors.turnDegrees(angle - self.orientation, 5)
+        time.sleep(3)
+        Motors.moveDistance(distance)
+        time.sleep(distance/15 + 1)
         self.map.mark_location(self.x, self.y, ' ')
         self.map.mark_relative_location(self.x, self.y, distance, angle, 'R')
         self.update_position(distance, angle)
