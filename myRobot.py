@@ -49,12 +49,12 @@ class myRobot:
 
     def move_forward(self, distance, angle):
         Motors.turnDegrees(angle - self.orientation, 5)
-        time.sleep(3)
+        time.sleep(1)
         Motors.moveDistance(distance)
         time.sleep(distance/15 + 1)
-        self.map.mark_location(self.x, self.y, ' ')
-        self.map.mark_relative_location(self.x, self.y, distance, angle, 'R')
-        self.update_position(distance, angle)
+        #self.map.mark_location(self.x, self.y, ' ')
+        #self.map.mark_relative_location(self.x, self.y, distance, angle, 'R')
+        #self.update_position(distance, angle)
 
     def set_dest(self, x, y):
         self.dest = [x, y]
@@ -65,14 +65,17 @@ class myRobot:
 #Choose the angle with the longest clearance.
 #That means move towards the obstacle furthest away.
 
-run = 0
+run = 1
 R = myRobot(40, 40, 0, Turn.Left)
 R.map.display_map()
+
 
 if (run):
     
     rc = RoverController()
     rc.connectIP()
-    R.sweep()
-    R.map.display_map()
+    #R.sweep()
+    #R.map.display_map()
 
+while (Ultrasonic.read() > 9):
+    R.move_forward(5, 0)
