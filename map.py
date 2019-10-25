@@ -21,6 +21,7 @@ class Map:
         self.grids[y][x] = icon
 
     def mark_relative_location(self, currentX, currentY, distance, angle, icon):
-        locationX = int(currentX + distance*m.cos(angle))
-        locationY = int(currentY + distance*m.sin(angle))
+        angle_rad = angle * m.pi/180
+        locationX = int(currentX + distance*m.cos(angle_rad))
+        locationY = int(currentY + distance*m.sin(angle_rad))
         self.mark_location(locationX, locationY, icon)
