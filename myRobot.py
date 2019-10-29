@@ -32,10 +32,10 @@ class myRobot:
     def get_turn_priority(self):
         return self.turn.name
 
-    def sweep(self, increment = 5, coneAngle = 180):
+    def sweep(self, increment = 5, coneAngle = 110):
         #Turn left 90 degrees. Then start the sweep.
         Motors.turnDegrees(-coneAngle/2,4)
-        self.update_position(0,self.orientation-coneAngle)
+        self.update_position(0,self.orientation+coneAngle/2)
         R.map.mark_robot_pos(self.x , self.y, self.orientation)
         time.sleep(3)
         measurements = []
@@ -48,10 +48,18 @@ class myRobot:
             if (distance <= 40):
                 self.map.mark_relative_location(self.x, self.y, distance, self.orientation, 2)
                 measurements.append(measPair)
+                Motors.turnDegrees(int(8), 3)
+                self.update_position(0,self.orientation-increment)
+                R.map.mark_robot_pos(self.x , self.y, self.orientation)
+
                 #1.6 seems to be how much extra angle is needed to get correct angle
-            Motors.turnDegrees(int(increment*1.6), 3)
-            self.update_position(0,self.orientation-increment)
-            R.map.mark_robot_pos(self.x , self.y, self.orientation)
+            else :
+                self.map.cone_error(self.x, self.y,self.orientation,0)
+                Motors.turnDegrees(15, 3)
+                angle = angle +15
+                self.update_position(0,self.orientation-15)
+                R.map.mark_robot_pos(self.x , self.y, self.orientation)
+            
             R.map.display_map()
             time.sleep(0.4)
 
@@ -77,7 +85,7 @@ class myRobot:
 #That means move towards the obstacle furthest away.
 
 run = 1
-R = myRobot(200, 200, m.pi/2, Turn.Left)
+R = myRobot(200, 200, 90, Turn.Left)
 R.map.display_map()
 
 
