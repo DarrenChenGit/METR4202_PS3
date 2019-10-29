@@ -32,7 +32,7 @@ class myRobot:
     def get_turn_priority(self):
         return self.turn.name
 
-    def sweep(self, increment = 5, coneAngle = 110):
+    def sweep(self, increment = 5, coneAngle = 180):
         #Turn left 90 degrees. Then start the sweep.
         Motors.turnDegrees(-coneAngle/2,4)
         self.update_position(0,self.orientation+coneAngle/2)
@@ -40,28 +40,44 @@ class myRobot:
         time.sleep(3)
         measurements = []
         distance = 0
-        for angle in range(0, coneAngle, increment):
+        angle = 0
+        skip_angle = 20
+        skip_set = 0
+        while 1:
+            if angle >= coneAngle:
+                break
             
             distance = Ultrasonic.read() +6
             measPair = (angle, distance)
             index = int(angle/increment)
             if (distance <= 40):
-                self.map.mark_relative_location(self.x, self.y, distance, self.orientation, 2)
-                measurements.append(measPair)
-                Motors.turnDegrees(int(8), 3)
-                self.update_position(0,self.orientation-increment)
-                R.map.mark_robot_pos(self.x , self.y, self.orientation)
+                if (skip_set == 0):
+                    self.map.mark_relative_location(self.x, self.y, distance, self.orientation, 2)
+                    measurements.append(measPair)
+                    Motors.turnDegrees(7.5, 3)
+                    self.update_position(0,self.orientation-increment)
+                    R.map.mark_robot_pos(self.x , self.y, self.orientation)
+                    angle = angle +5
+                else:
+                    skip_set = 0
+                    self.map.cone_error(self.x, self.y,self.orientation,skip_angle-increment)
+                    Motors.turnDegrees(skip_angle-increment, 3)
+                    self.update_position(0,self.orientation-skip_angle+increment)
+                    R.map.mark_robot_pos(self.x , self.y, self.orientation)
+                    angle = angle + skip_angle-increment
+
 
                 #1.6 seems to be how much extra angle is needed to get correct angle
             else :
-                self.map.cone_error(self.x, self.y,self.orientation,0)
-                Motors.turnDegrees(15, 3)
-                angle = angle +15
-                self.update_position(0,self.orientation-15)
+                self.map.cone_error(self.x, self.y,self.orientation,skip_angle)
+                Motors.turnDegrees(7.5, 3)
+                self.update_position(0,self.orientation-increment)
                 R.map.mark_robot_pos(self.x , self.y, self.orientation)
+                angle = angle + increment
+                skip_set = 1
             
             R.map.display_map()
-            time.sleep(0.4)
+            time.sleep(.8)
 
         
 

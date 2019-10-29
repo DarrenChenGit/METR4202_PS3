@@ -49,8 +49,8 @@ class Map:
             for b in range(14):
                 self.mark_location(int(X+a*m.cos(ori_rad-m.pi/2)+b*m.cos(ori_rad)),int(Y+a*m.sin(ori_rad-m.pi/2)+b*m.sin(ori_rad)),1)
                
-    def cone_error(self,x_pos,y_pos,orientation,icon):
+    def cone_error(self,x_pos,y_pos,orientation,angle):
         for a in range(40):
-            for b in range (-15,15,1):
+            for b in range (-angle,angle,1):
                 self.mark_relative_location(x_pos,y_pos,a,orientation+b,0)
         
