@@ -12,11 +12,13 @@ class Turn(enum.Enum):
 class myRobot:
     def __init__(self, x_size, y_size, orientation, turn):
         self.x = int(x_size/2)
-        self.y = int(0)
+        self.y = int(21)
         self.orientation = orientation
         self.turn = turn
         self.map = Map(x_size, y_size)
-        self.map.grids[int(self.y)][int(self.x)] = 1
+        self.map.mark_robot_pos(self.x,self.y,orientation)
+        #self.map.mark_location(self.x,self.y,1)
+        #self.map.grids[int(self.y)][int(self.x)] = 1
         self.dest = []
 
     def update_position(self, distance, orientation):
@@ -32,28 +34,37 @@ class myRobot:
 
     def sweep(self, increment = 5, coneAngle = 180):
         #Turn left 90 degrees. Then start the sweep.
-        Motors.turnDegrees(-90, 6)
-        time.sleep(4)
+        Motors.turnDegrees(-coneAngle/2,4)
+        self.update_position(0,self.orientation-coneAngle)
+        R.map.mark_robot_pos(self.x , self.y, self.orientation)
+        time.sleep(3)
         measurements = []
         distance = 0
         for angle in range(0, coneAngle, increment):
-            distance = Ultrasonic.read() + 6
+            
+            distance = Ultrasonic.read() +6
             measPair = (angle, distance)
             index = int(angle/increment)
             if (distance <= 40):
-                self.map.mark_relative_location(self.x, self.y, distance/2, angle, '0')
+                self.map.mark_relative_location(self.x, self.y, distance, self.orientation, 2)
                 measurements.append(measPair)
-            Motors.turnDegrees(increment, 10)
-            print(distance)
-            time.sleep(0.6)
+                #1.6 seems to be how much extra angle is needed to get correct angle
+            Motors.turnDegrees(int(increment*1.6), 3)
+            self.update_position(0,self.orientation-increment)
+            R.map.mark_robot_pos(self.x , self.y, self.orientation)
+            R.map.display_map()
+            time.sleep(0.4)
+
+        
 
     def move_forward(self, distance, angle):
-        Motors.turnDegrees(angle - self.orientation, 5)
-        time.sleep(3)
+        if angle == self.orientation:
+            Motors.turnDegrees(angle - self.orientation, 5)
+            time.sleep(3)
         Motors.moveDistance(distance)
         time.sleep(distance/15 + 1)
-        self.map.mark_location(self.x, self.y, ' ')
-        self.map.mark_relative_location(self.x, self.y, distance, angle, 'R')
+        self.map.mark_location(self.x, self.y, 0)
+        self.map.mark_relative_location(self.x, self.y, distance, angle, 1)
         self.update_position(distance, angle)
 
     def set_dest(self, x, y):
@@ -65,21 +76,18 @@ class myRobot:
 #Choose the angle with the longest clearance.
 #That means move towards the obstacle furthest away.
 
-run = 0
-R = myRobot(40, 40, 0, Turn.Left)
+run = 1
+R = myRobot(200, 200, m.pi/2, Turn.Left)
+R.map.display_map()
 
-R.map.mark_location(20,35,3)
-ynum = 0
-while(ynum < 5):
-    R.map.mark_location(5,ynum,2)
-    R.map.display_map()
-    ynum= ynum + 1
-    time.sleep(1)
 
 if (run):
     
     rc = RoverController()
     rc.connectIP()
     R.sweep()
-    R.map.display_map()
-
+    #while 1:
+    #    R.move_forward(2,m.pi/2)
+    #    R.map.display_map()
+    #    time.sleep(.5)
+    
