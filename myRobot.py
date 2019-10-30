@@ -35,9 +35,10 @@ class myRobot:
     def sweep(self, increment = 5, coneAngle = 180):
         #Turn left 90 degrees. Then start the sweep.
         Motors.turnDegrees(-coneAngle/2,4)
+        time.sleep(3)
         self.update_position(0,self.orientation+coneAngle/2)
         R.map.mark_robot_pos(self.x , self.y, self.orientation)
-        time.sleep(3)
+        
         measurements = []
         distance = 0
         angle = 0
@@ -47,7 +48,7 @@ class myRobot:
             if angle >= coneAngle:
                 break
             
-            distance = Ultrasonic.read() +6
+            distance = Ultrasonic.read() + 6
             measPair = (angle, distance)
             index = int(angle/increment)
             if (distance <= 40):
@@ -55,7 +56,7 @@ class myRobot:
                     self.map.mark_relative_location(self.x, self.y, distance, self.orientation, 2)
                     measurements.append(measPair)
                     Motors.turnDegrees(7.5, 3)
-                    self.update_position(0,self.orientation-increment)
+                    self.update_position(0, self.orientation-increment)
                     R.map.mark_robot_pos(self.x , self.y, self.orientation)
                     angle = angle +5
                 else:
@@ -79,7 +80,28 @@ class myRobot:
             R.map.display_map()
             time.sleep(.8)
 
-        
+    #Sweep using the left IR sensor.
+    def ir_sweep(self, coneAngle, increment):
+        offsetAngle = 90 - coneAngle/2
+        Motors.turnDegrees(offsetAngle, 4)
+        time.sleep(5)
+
+        #Update position and mark robot position on map.
+        self.update_position(0, self.orientation + offsetAngle)
+        R.map.mark_robot_pos(self.x , self.y, self.orientation)
+
+        measurements = []
+        for angle in range(0, coneAngle + increment, increment):
+            IR_reading = IR.readLeft() + 2
+            if (IR_reading < 100):
+                print(IR_reading)
+                measurements.append(IR_reading)
+                self.map.mark_relative_location(self.x, self.y, IR_reading, self.orientation, 2)
+                Motors.turnDegrees(increment, 4)
+                time.sleep(0.4)
+
+
+
 
     def move_forward(self, distance, angle):
         if angle == self.orientation:
@@ -100,16 +122,16 @@ class myRobot:
 #Choose the angle with the longest clearance.
 #That means move towards the obstacle furthest away.
 
-run = 1
+run = 0
 R = myRobot(200, 200, 90, Turn.Left)
-R.map.display_map()
+#R.map.display_map()
 
 
 if (run):
     
     rc = RoverController()
     rc.connectIP()
-    R.sweep()
+    R.ir_sweep(120, 10)
     #while 1:
     #    R.move_forward(2,m.pi/2)
     #    R.map.display_map()
