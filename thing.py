@@ -30,6 +30,53 @@ def adbinarize(image):
     binary = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,115,1)
     return binary
 
+def qrcodefunction(image):
+    barcodes = pyzbar.decode(image)
+    x = 0
+    y = 0
+    w = 0
+    h = 0
+    knownwidth = 7 #cm
+    knowndistance = 41 #cm
+    knowpixelwidth = 320
+    focal = (knowpixelwidth*knowndistance)/knownwidth
+    
+    for barcode in barcodes:
+        (x, y, w, h)= barcode.rect
+        
+    if x == 0:
+        print('No qr code')
+        
+    else:
+        print('found qr code')
+        
+    cv2.rectangle(image, (x, y), (x + w, y + h)
+                  , (0, 255, 0), 2)
+    dif = x + w/2 - 960
+    
+        
+    if x + (w/2) >1160 or x + (w/2) < 760:
+        cv2.circle(image, (x + int(round(w/2)), y + int(round(h/2))), 5, (0, 0,255), -1)
+        if x == 0:
+            print('')
+        else:
+            print('outside the area')
+    else:
+        cv2.circle(image, (x + int(round(w/2)), y + int(round(h/2))), 5, (0, 255,0), -1)
+        print('Inside the area')
+
+    if w == 0:
+        print('')
+    else:
+        distance = (knownwidth*focal)/w
+        print('mid point of qr code =', x+(w/2))
+        print('horizontal distance from center = ',dif)
+        print('x =', x)
+        print('y =', y)
+        print('w =', w)
+        print('h =', h)
+        print('qr code distance =', distance)   
+    
 def findbarcode(image):
     # Find the barcodes in the image
     barcodes = pyzbar.decode(image)
@@ -40,13 +87,27 @@ def findbarcode(image):
             , (0, 255, 0), 2)
         
         dif = x + w/2 - 960
+        print('mid point of qr code =', x+(w/2))
         print('horizontal distance from center = ',dif)
         print('x =', x)
         print('y =', y)
         print('w =', w)
         print('h =', h)
-        print('mid point of qr code =', x+(w/2))
         
+        
+def checkqr(image):
+    barcodes = pyzbar.decode(image)
+    x = 0
+    y = 0
+    w = 0
+    h = 0
+    for barcode in barcodes:
+        (x, y, w, h)= barcode.rect
+    if x == 0:
+        print('No qr code')
+    else:
+        print('found qr code')
+            
 def findbarcenter(image):
     barcodes = pyzbar.decode(image)
     
@@ -88,14 +149,16 @@ def main():
 ##    
 ##    
 ##    contours, hierarchy = cv2.findContours(dilate,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-    
-    findbarcode(image)
+
+    #checkqr(image)
+    #findbarcode(image)
 ##    for contour in contours:
 ##        if cv2.contourArea(contour)>1000:
 ##            cv2.drawContours(image,contour,-1, (0,0,255),2)
     
-    findbarcenter(image)
-    finddistance(image)
+    #findbarcenter(image)
+    #finddistance(image)
+    qrcodefunction(image)
     
     delta = 200
     maxrange = 960 + delta
