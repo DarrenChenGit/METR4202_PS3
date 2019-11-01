@@ -27,7 +27,7 @@ def binarize(image, ret):
     return binary
 
 def adbinarize(image):
-    binary = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,115,1)
+    binary = cv2.adaptiveThreshold(image,255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,115,1)
     return binary
 
 def qrcodefunction(image):

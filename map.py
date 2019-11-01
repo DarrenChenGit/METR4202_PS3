@@ -30,11 +30,12 @@ class Map:
         plt.pause(0.001)
                     
     def mark_location(self, x, y, icon):
-         if ((0 < x < self.x_length) & (0 < y < self.y_length)):
+        if ((0 < x < self.x_length) and (0 < y < self.y_length)):
             self.grids[int(y)][int(x)] = int(icon)
+            
 
     def mark_relative_location(self, currentX, currentY, distance, angle, icon):
-        angle_rad = angle * m.pi/180    
+        angle_rad = m.radians(angle)  
         locationX = int(currentX + distance*m.cos(angle_rad))
         locationY = int(currentY + distance*m.sin(angle_rad))
         self.mark_location(locationX, locationY, icon)
@@ -47,7 +48,8 @@ class Map:
 
         for a in range(14):
             for b in range(14):
-                self.mark_location(int(X+a*m.cos(ori_rad-m.pi/2)+b*m.cos(ori_rad)),int(Y+a*m.sin(ori_rad-m.pi/2)+b*m.sin(ori_rad)),1)
+                self.mark_location(int(X+a*m.cos(ori_rad-m.pi/2)
+                +b*m.cos(ori_rad)),int(Y+a*m.sin(ori_rad-m.pi/2)+b*m.sin(ori_rad)),1)
                
     def cone_error(self,x_pos,y_pos,orientation,angle):
         for a in range(40):
