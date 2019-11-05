@@ -226,9 +226,11 @@ if (run):
     
     rc = RoverController()
     rc.connectIP()
-    R.ultrasound_sweep(60, 30)
+    #R.ultrasound_sweep(60, 30)
    
     #R.ir_sweep(120, 10)
-    #while 1:
+    while 1:
+        R.cont_move()
+        R.avoid_obstacle()
        
     

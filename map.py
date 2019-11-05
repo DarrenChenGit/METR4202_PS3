@@ -58,7 +58,7 @@ class Map:
 
     #Function to calculate distance between 2 points and get the relative angle.
     #Between two points with respect to 90 degrees of world coordinate.
-    def get_distance_and_angle(self, self_x, self_y, dest_x, dest_y):
+    def get_dist_angle(self, self_x, self_y, dest_x, dest_y):
         returnVal = [] #Empty list to be filled.
         x = dest_x - self_x
         y = dest_y - self_y
