@@ -39,6 +39,7 @@ class Map:
         locationX = int(currentX + distance*m.cos(angle_rad))
         locationY = int(currentY + distance*m.sin(angle_rad))
         self.mark_location(locationX, locationY, icon)
+        return (locationX, locationY)
 
     def mark_robot_pos(self, x_pos , y_pos, orientation):
         self.grids[self.grids == 1] = 0
@@ -52,9 +53,11 @@ class Map:
                 +b*m.cos(ori_rad)),int(Y+a*m.sin(ori_rad-m.pi/2)+b*m.sin(ori_rad)),1)
                
     def cone_error(self,x_pos,y_pos,orientation,angle):
+        array = []
         for a in range(40):
             for b in range (-angle,angle,1):
-                self.mark_relative_location(x_pos,y_pos,a,orientation+b,0)
+                array.append(self.mark_relative_location(x_pos,y_pos,a,orientation+b,0))
+        return array
 
     #Function to calculate distance between 2 points and get the relative angle.
     #Between two points with respect to 90 degrees of world coordinate.
@@ -65,21 +68,10 @@ class Map:
         euclidDist = m.sqrt(x^2 + y^2) #Calc distance
         returnVal.append(euclidDist)
         angle = m.degrees(m.atan(y/x)) #Calc angle.
-        #We want the obtuse angle if the objective is behind us.
-
-
-        if (y < 0 and x < 0):
-            returnVal.append(-180 + angle)
-        
-        elif (x < 0  and y >= 0):
-            returnVal.append(angle)
-
-        elif (x >= 0 and y >= 0):
-            returnVal.append(angle)
-
-        else:
-            returnVal.append(180 + angle)
-
+        returnVal.append(angle)
         return returnVal
+
+   
+
         
-        
+       

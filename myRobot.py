@@ -29,7 +29,7 @@ class myRobot:
         self.state = State.Explore
         #self.map.mark_location(self.x,self.y,1)
         #self.map.grids[int(self.y)][int(self.x)] = 1
-        self.dest = []
+        self.dest = [100,195]
         self.obstacles = []
 
     #Integrated function that uses Motors and Map to update location.
@@ -114,7 +114,7 @@ class myRobot:
                 error = self.map.cone_error(self.x, self.y,self.orientation,skip_angle)
                 for x in error.len():
                     self.obstacles.remove(error[x])
-                Motors.turnDegrees(7.5, 3)
+                    self.turn_robot(7.5)
                 self.update_position(0,self.orientation-increment)
                 R.map.mark_robot_pos(self.x , self.y, self.orientation)
                 angle = angle + increment
@@ -175,22 +175,66 @@ class myRobot:
 
     #Avoid an obstacle by turning left/right then moving away.
     def avoid_obstacle(self):
+        
         leftReading = IR.readLeft()
         rightReading = IR.readRight()
-        if (leftReading > 10):
-            self.turn = Turn.Left
+        if self.x < 100:
+            if rightReading > 25:
+                self.turn_robot(90)
+                self.ir_pass(right)
+
+            elif leftReading >25:
+                self.turn_robot(-90)
+                self.ir_pass(left)
+            else:
+                self.move_forward(-10)
+        elif leftReading >25:
             self.turn_robot(-90)
-            self.move_forward(leftReading/2)
-        
-        elif (rightReading > 10):
-            self.turn = Turn.Right
+            self.ir_pass(left)
+        elif rightReading >25:
             self.turn_robot(90)
-            self.move_forward(rightReading/2)
-        
+            self.ir_pass(right)
         else:
-            #We might wanna reverse.
             self.move_forward(-10)
+
         
+
+        #if (leftReading > 10):
+        #    self.turn = Turn.Left
+        #    self.turn_robot(-90)
+        #    self.move_forward(leftReading/2)
+        
+        #elif (rightReading > 10):
+        #    self.turn = Turn.Right
+        #    self.turn_robot(90)
+        #    self.move_forward(rightReading/2)
+        
+        #else:
+        #    #We might wanna reverse.
+        #    self.move_forward(-10)
+
+    def ir_pass(self, turn):
+        if turn == left:
+            while IR.readLeft() < 10:
+                if Ultrasonic.read() > 7:
+                    self.move_forward(2)
+            x = 0
+            while x < 10:
+                if Ultrasonic.read() < 7:
+                    self.move_forward(2)
+                    x = x+2
+        elif turn == right:
+            while IR.readRight() < 10:
+                if Ultrasonic.read() > 7:
+                    self.move_forward(2)
+            x = 0
+            while x < 10:
+                if Ultrasonic.read() < 7:
+                    self.move_forward(2)
+                    x = x+2
+
+
+
     #Continuous move.
     def cont_move(self):
         dist = Ultrasonic.read()
@@ -254,8 +298,19 @@ if (run):
     #R.ultrasound_sweep(60, 30)
    
     #R.ir_sweep(120, 10)
+    #while 1:
+    #    R.cont_move()
+    #    R.avoid_obstacle
     while 1:
-        R.cont_move()
-        R.avoid_obstacle()
+        R.turn_robot(R.get_dest_angle())
+        R.sweep()
+        R.turn_robot(R.get_dest_angle())
+        if R.check_collision():
+            D = R.check_collision()
+            R.move_forward(D-5)
+            R.avoid_obstacle()
        
+
+        else:
+            R.move_forward(25)
     
