@@ -144,6 +144,13 @@ class myRobot:
         
         return measurements
 
+    def get_dest_angle(self):
+        if (self.dest):
+            return self.map.get_dist_angle(self.x, self.y, self.dest[0], self.dest[1])
+
+        else:
+            return None
+
     def ultrasound_sweep(self, coneAngle, increment):
         #Turn left.
         self.turn_robot(-coneAngle/2)

@@ -65,7 +65,21 @@ class Map:
         euclidDist = m.sqrt(x^2 + y^2) #Calc distance
         returnVal.append(euclidDist)
         angle = m.degrees(m.atan(y/x)) #Calc angle.
-        returnVal.append(angle)
+        #We want the obtuse angle if the objective is behind us.
+
+
+        if (y < 0 and x < 0):
+            returnVal.append(-180 + angle)
+        
+        elif (x < 0  and y >= 0):
+            returnVal.append(angle)
+
+        elif (x >= 0 and y >= 0):
+            returnVal.append(angle)
+
+        else:
+            returnVal.append(180 + angle)
+
         return returnVal
         
         
