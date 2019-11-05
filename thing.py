@@ -27,7 +27,7 @@ def binarize(image, ret):
     return binary
 
 def adbinarize(image):
-    binary = cv2.adaptiveThreshold(image,255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,115,1)
+    binary = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,115,1)
     return binary
 
 def qrcodefunction(image):
@@ -37,45 +37,63 @@ def qrcodefunction(image):
     w = 0
     h = 0
     knownwidth = 7 #cm
-    knowndistance = 41 #cm
-    knowpixelwidth = 320
+    knowndistance = 30 #cm
+    knowpixelwidth = 425
     focal = (knowpixelwidth*knowndistance)/knownwidth
+    gray = grayscale(image)
+    bi = adbinarize(gray)
     
     for barcode in barcodes:
-        (x, y, w, h)= barcode.rect
+        (x, y, w, h) = barcode.rect
+
+    # Check if camera found qr code in normal image
+    
+    if x == 0: # no qr code found in normal image
         
-    if x == 0:
-        print('No qr code')
+        barcodes = pyzbar.decode(bi) # Try finding qr code in binary image
         
+        for barcode in barcodes:
+            (x, y, w, h) = barcode.rect
+            
+        if x == 0: # no qr code found in binary image
+            print('No qr code')
+
+        else: # Found qr code in binary image
+            cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            print('found qr code')
+           
     else:
+        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
         print('found qr code')
         
-    cv2.rectangle(image, (x, y), (x + w, y + h)
-                  , (0, 255, 0), 2)
+    
     dif = x + w/2 - 960
     
         
-    if x + (w/2) >1160 or x + (w/2) < 760:
-        cv2.circle(image, (x + int(round(w/2)), y + int(round(h/2))), 5, (0, 0,255), -1)
+    if x + (w/2) > 1160 or x + (w/2) < 760:
         if x == 0:
             print('')
         else:
+            cv2.circle(image, (x + int(round(w/2)), y + int(round(h/2))), 5, (0, 0,255), -1)
             print('outside the area')
     else:
         cv2.circle(image, (x + int(round(w/2)), y + int(round(h/2))), 5, (0, 255,0), -1)
         print('Inside the area')
 
-    if w == 0:
+    if h == 0:
         print('')
     else:
-        distance = (knownwidth*focal)/w
+        distance = (knownwidth*focal)/h
         print('mid point of qr code =', x+(w/2))
         print('horizontal distance from center = ',dif)
         print('x =', x)
         print('y =', y)
         print('w =', w)
         print('h =', h)
-        print('qr code distance =', distance)   
+        print('qr code distance =', distance)
+        print('')
+        print('')
+        print('')
     
 def findbarcode(image):
     # Find the barcodes in the image
@@ -169,7 +187,7 @@ def main():
     cv2.line(image, (maxrange,0), (maxrange,1080), (255,0, 0), 1)
     
     cv2.imshow('image', image)
-    cv2.waitKey(0)
+    main()
 
 main()    
     
