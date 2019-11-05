@@ -30,6 +30,7 @@ class myRobot:
         #self.map.mark_location(self.x,self.y,1)
         #self.map.grids[int(self.y)][int(self.x)] = 1
         self.dest = []
+        self.obstacles = []
 
     #Integrated function that uses Motors and Map to update location.
     #Convention:
@@ -81,7 +82,7 @@ class myRobot:
         self.update_position(0, self.orientation+coneAngle/2)
         R.map.mark_robot_pos(self.x , self.y, self.orientation)
         
-        measurements = []
+        
         distance = 0
         angle = 0
         skip_angle = 20
@@ -91,28 +92,28 @@ class myRobot:
                 break
             
             distance = Ultrasonic.read() + 6
-            measPair = (angle, distance)
+            
             index = int(angle/increment)
             if (distance <= 40):
                 if (skip_set == 0):
-                    self.map.mark_relative_location(self.x, self.y, distance, self.orientation, 2)
-                    measurements.append(measPair)
-                    Motors.turnDegrees(7.5, 3)
-                    self.update_position(0, self.orientation-increment)
-                    R.map.mark_robot_pos(self.x , self.y, self.orientation)
+                    self.obstacles.append( self.map.mark_relative_location(self.x, self.y, distance, self.orientation, 2))
+                    self.turn_robot(7.5)
                     angle = angle +5
                 else:
                     skip_set = 0
-                    self.map.cone_error(self.x, self.y,self.orientation,skip_angle-increment)
-                    Motors.turnDegrees(skip_angle-increment, 3)
-                    self.update_position(0,self.orientation-skip_angle+increment)
-                    R.map.mark_robot_pos(self.x , self.y, self.orientation)
+                    error = self.map.cone_error(self.x, self.y,self.orientation,skip_angle-increment)
+                    for x in error.len():
+                        self.obstacles.remove(error[x])
+
+                    self.turn_robot(skip_angle-increment)
                     angle = angle + skip_angle-increment
 
 
                 #1.6 seems to be how much extra angle is needed to get correct angle
             else :
-                self.map.cone_error(self.x, self.y,self.orientation,skip_angle)
+                error = self.map.cone_error(self.x, self.y,self.orientation,skip_angle)
+                for x in error.len():
+                    self.obstacles.remove(error[x])
                 Motors.turnDegrees(7.5, 3)
                 self.update_position(0,self.orientation-increment)
                 R.map.mark_robot_pos(self.x , self.y, self.orientation)
@@ -220,6 +221,23 @@ class myRobot:
 
     def move_to_objective(self):
         return 0
+
+    def check_collision(self):
+        
+        ori_rad = self.orientation * m.pi/180
+        X = x_pos + 7*m.sqrt(2)*m.cos(ori_rad+ m.atan(10/7))
+        Y = y_pos + 7*m.sqrt(2)*m.sin(ori_rad+m.atan(10/7))
+
+        for a in range(30):
+            for b in range(20):
+                if (int(X+a*m.cos(ori_rad)+b*m.cos(ori_rad-m.pi/2)),int(Y+a*m.sin(ori_rad)+b*m.sin(ori_rad-m.pi/2))) in self.obstacles:
+                    return a 
+        return None
+                
+        
+
+
+
 
 #Choose the angle with the longest clearance.
 #That means move towards the obstacle furthest away.
