@@ -13,21 +13,22 @@ class Map:
 
     #becareful of indexing, it is y, x.
     def display_map(self):
+        if 1:
         
-        plt.imsave('map_pic.png', np.flipud(self.grids), cmap=cm.gray)
-        #for y in range(0, self.y_length, 1):
+            plt.imsave('map_pic.png', np.flipud(self.grids), cmap=cm.gray)
+            #for y in range(0, self.y_length, 1):
             
-        #    for x in range(0, self.x_length, 1):
-        #        print('|' + str(self.grids[self.y_length - 1 - y][x]), end = '')
+            #    for x in range(0, self.x_length, 1):
+            #        print('|' + str(self.grids[self.y_length - 1 - y][x]), end = '')
             
-        #        if x == (self.x_length - 1):
-        #            print('|')
+            #        if x == (self.x_length - 1):
+            #            print('|')
         
-        img=mpimg.imread('map_pic.png')
-        imgplot = plt.imshow(img)
+            img=mpimg.imread('map_pic.png')
+            imgplot = plt.imshow(img)
         
-        plt.show()
-        plt.pause(0.001)
+            plt.show()
+            plt.pause(0.001)
                     
     def mark_location(self, x, y, icon):
         if ((0 < x < self.x_length) and (0 < y < self.y_length)):
@@ -65,10 +66,31 @@ class Map:
         returnVal = [] #Empty list to be filled.
         x = dest_x - self_x
         y = dest_y - self_y
-        euclidDist = m.sqrt(x^2 + y^2) #Calc distance
+        euclidDist = m.sqrt(x*x + y*y) #Calc distance
         returnVal.append(euclidDist)
-        angle = m.degrees(m.atan(y/x)) #Calc angle.
-        returnVal.append(angle)
+        if (x):
+            angle = m.degrees(m.atan(x/y)) #Calc angle.
+        if x == 0:
+            if y >= 0:
+                returnVal.append(90)
+
+            else:
+                returnVal.append(-90)
+
+            return returnVal
+
+        if (y < 0 and x > 0):
+            returnVal.append(angle)
+
+        elif (x < 0 and y >= 0):
+            returnVal.append(90- angle)
+
+        elif (x >= 0 and y >= 0):
+            returnVal.append(90-angle)
+
+        else:
+            returnVal.append(-90-angle)
+         
         return returnVal
 
    

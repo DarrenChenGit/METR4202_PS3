@@ -17,7 +17,7 @@ class State(enum.Enum):
     Returning = 2
 
 class myRobot:
-    def __init__(self, turn, x_size = 200, y_size = 200, speed = 4, turnSpeed = 4, orientation = 90):
+    def __init__(self, turn, x_size = 200, y_size = 200, speed = 3, turnSpeed = 4, orientation = 90):
         self.x = int(x_size/2)
         self.y = int(21)
         self.orientation = orientation #Orientation w.r.t to world coordinates.
@@ -29,8 +29,9 @@ class myRobot:
         self.state = State.Explore
         #self.map.mark_location(self.x,self.y,1)
         #self.map.grids[int(self.y)][int(self.x)] = 1
-        self.dest = [100,195]
+        self.dest = [90,195]
         self.obstacles = []
+        
 
     #Integrated function that uses Motors and Map to update location.
     #Convention:
@@ -40,28 +41,34 @@ class myRobot:
         delay = ((2 * m.pi * 8) * (abs(degrees)/360)) / self.turnSpeed 
         self.orientation -= degrees
         if run:
-            Motors.turnDegrees(degrees, self.turnSpeed)
+            if degrees == 5:
+                Motors.turnDegrees(7.5, self.turnSpeed)
+            else:
+                Motors.turnDegrees(degrees, self.turnSpeed)
             time.sleep(delay + 0.5)
         #Mark the robot position.
         self.map.mark_robot_pos(self.x , self.y, self.orientation)
 
     def move_forward(self, distance):
-        #Calculate where the robot should be if it moved.
+        ##Calculate where the robot should be if it moved.
         destX = self.x + distance * m.cos(m.radians(self.orientation))
         destY = self.y + distance * m.sin(m.radians(self.orientation))
 
-        #Only move if it is within bounds.
-        if ((0 < destX < self.map.x_length) and (0 < destY < self.map.y_length)):
-            if (run):
-                Motors.moveDistance(distance)
-                time.sleep(distance/self.speed)
-            self.update_position(distance, self.orientation)
-            #self.map.mark_robot_pos(self.x , self.y, self.orientation)
+        ##Only move if it is within bounds.
+        #if ((0 < destX < self.map.x_length) and (0 < destY < self.map.y_length)):
+        #    if (run):
+        #        Motors.moveDistance(distance)
+        #        time.sleep(distance/self.speed)
+        #    self.update_position(distance, self.orientation)
+        #    #self.map.mark_robot_pos(self.x , self.y, self.orientation)
             
-        #Out of bounds movement.
-        else:
-            print("Robot will move out of bounds if moved!")
-
+        ##Out of bounds movement.
+        #else:
+        #    print("Robot will move out of bounds if moved!")
+        Motors.moveDistance(distance)
+        time.sleep(abs(distance)/self.speed)
+        self.update_position(distance, self.orientation)
+        self.map.mark_robot_pos(self.x , self.y, self.orientation)
 
     def update_position(self, distance, orientation):
         angle_rad = m.radians(orientation)
@@ -75,7 +82,7 @@ class myRobot:
     def get_turn_priority(self):
         return self.turn.name
 
-    def sweep(self, increment = 5, coneAngle = 180):
+    def sweep(self, increment = 5, coneAngle = 50):
         #Turn left 90 degrees. Then start the sweep.
         Motors.turnDegrees(-coneAngle/2,4)
         time.sleep(3)
@@ -97,13 +104,14 @@ class myRobot:
             if (distance <= 40):
                 if (skip_set == 0):
                     self.obstacles.append( self.map.mark_relative_location(self.x, self.y, distance, self.orientation, 2))
-                    self.turn_robot(7.5)
+                    self.turn_robot(5)
                     angle = angle +5
                 else:
                     skip_set = 0
                     error = self.map.cone_error(self.x, self.y,self.orientation,skip_angle-increment)
-                    for x in error.len():
-                        self.obstacles.remove(error[x])
+                    for x in error:
+                        if x in self.obstacles:
+                            self.obstacles.remove(x)
 
                     self.turn_robot(skip_angle-increment)
                     angle = angle + skip_angle-increment
@@ -112,14 +120,15 @@ class myRobot:
                 #1.6 seems to be how much extra angle is needed to get correct angle
             else :
                 error = self.map.cone_error(self.x, self.y,self.orientation,skip_angle)
-                for x in error.len():
-                    self.obstacles.remove(error[x])
-                    self.turn_robot(7.5)
-                self.update_position(0,self.orientation-increment)
-                R.map.mark_robot_pos(self.x , self.y, self.orientation)
+                for x in error:
+                    if x in self.obstacles:
+                        self.obstacles.remove(x)
+                self.turn_robot(5)
+               
                 angle = angle + increment
                 skip_set = 1
             
+
             R.map.display_map()
             time.sleep(.8)
 
@@ -147,7 +156,7 @@ class myRobot:
 
     def get_dest_angle(self):
         if (self.dest):
-            return self.map.get_dist_angle(self.x, self.y, self.dest[0], self.dest[1])
+            return self.map.get_dist_angle(self.x, self.y, self.dest[0], self.dest[1])[1]
 
         else:
             return None
@@ -175,7 +184,8 @@ class myRobot:
 
     #Avoid an obstacle by turning left/right then moving away.
     def avoid_obstacle(self):
-        
+        left = 1
+        right = 2
         leftReading = IR.readLeft()
         rightReading = IR.readRight()
         if self.x < 100:
@@ -214,24 +224,27 @@ class myRobot:
         #    self.move_forward(-10)
 
     def ir_pass(self, turn):
-        if turn == left:
-            while IR.readLeft() < 10:
-                if Ultrasonic.read() > 7:
-                    self.move_forward(2)
-            x = 0
-            while x < 10:
-                if Ultrasonic.read() < 7:
-                    self.move_forward(2)
-                    x = x+2
-        elif turn == right:
-            while IR.readRight() < 10:
-                if Ultrasonic.read() > 7:
-                    self.move_forward(2)
-            x = 0
-            while x < 10:
-                if Ultrasonic.read() < 7:
-                    self.move_forward(2)
-                    x = x+2
+        if turn == 1: #left
+            while IR.readLeft() < 15:
+                #if Ultrasonic.read() > 7:
+                #    self.move_forward(2)
+                self.move_forward(3)
+            self.move_forward(10)
+            #x = 0
+            #while x < 10:
+            #    if Ultrasonic.read() < 7:
+            #        self.move_forward(2)
+            #        x = x+2
+        elif turn == 2:
+            while IR.readRight() < 15:
+            #    if Ultrasonic.read() > 7:
+                self.move_forward(3)
+            self.move_forward(10)
+            #x = 0
+            #while x < 10:
+            #    if Ultrasonic.read() < 7:
+            #        self.move_forward(2)
+            #        x = x+2
 
 
 
@@ -260,8 +273,7 @@ class myRobot:
         if (not self.dest):
             print("No destination has been set!")
             return
-        meas = self.map.get_distance_and_angle(self.x, self.y, self.dest[0], self.dest[1])
-        Motors.turnDegrees(meas[1])
+        self.turn_robot(self.orientation-self.get_dest_angle())
 
     def move_to_objective(self):
         return 0
@@ -269,8 +281,8 @@ class myRobot:
     def check_collision(self):
         
         ori_rad = self.orientation * m.pi/180
-        X = x_pos + 7*m.sqrt(2)*m.cos(ori_rad+ m.atan(10/7))
-        Y = y_pos + 7*m.sqrt(2)*m.sin(ori_rad+m.atan(10/7))
+        X = self.x + 7*m.sqrt(2)*m.cos(ori_rad+ m.atan(10/7))
+        Y = self.y + 7*m.sqrt(2)*m.sin(ori_rad+m.atan(10/7))
 
         for a in range(30):
             for b in range(20):
@@ -302,9 +314,10 @@ if (run):
     #    R.cont_move()
     #    R.avoid_obstacle
     while 1:
-        R.turn_robot(R.get_dest_angle())
+        R.face_objective()
         R.sweep()
-        R.turn_robot(R.get_dest_angle())
+        R.face_objective()
+        
         if R.check_collision():
             D = R.check_collision()
             R.move_forward(D-5)
@@ -313,4 +326,3 @@ if (run):
 
         else:
             R.move_forward(25)
-    
