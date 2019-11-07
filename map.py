@@ -93,7 +93,17 @@ class Map:
          
         return returnVal
 
-   
+    #Checks to see if a point is within a square radius.
+    #Param: center_x, center_y is the center of the square
+    #x, y is the point to check if within square
+    #radius is the length of 1/2 side of the square.
+    def is_point_in_sqr_radius(self, center_x, center_y, x, y, radius):
+        if (center_x - radius <= x <= center_x + radius and
+        center_y - radius <= y <= center_y + radius):
+            return True
+
+        else: 
+            return False
 
         
        

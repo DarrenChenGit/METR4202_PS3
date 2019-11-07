@@ -4,7 +4,7 @@ import math
 import signal
 import sys
 from ._singleton import Singleton
-from .comms_constants import MicromelonOpCode as OPCODE, MicromelonType as OPTYPE, MicromelonImageResolution as IMRES, tupleForResolution
+from .comms_constants import MicromelonOpCode as OPCODE, MicromelonType as OPTYPE, MicromelonImageResolution as IMRES
 from ._tcp_controller import SerialTCPConnection
 
 class RoverController(metaclass=Singleton):
@@ -38,13 +38,9 @@ class RoverController(metaclass=Singleton):
     Timeout used for blocking reads of packets
     """
     if seconds == None:
-      self._READ_PACKET_TIMEOUT_SECS = 6.0
+      self._BLOCKING_READ_TIMEOUT_SECS = 120.0
     else:
-      self._READ_PACKET_TIMEOUT_SECS = seconds
-    
-    self._BLOCKING_READ_TIMEOUT_SECS = self._READ_PACKET_TIMEOUT_SECS / 3.0
-    if self._connection and self._connection.timeout:
-      self._connection.timeout = self._BLOCKING_READ_TIMEOUT_SECS
+      self._BLOCKING_READ_TIMEOUT_SECS = seconds
 
   def connectSerial(self, newPort = "/dev/ttyS0"):
     """
@@ -145,8 +141,14 @@ class RoverController(metaclass=Singleton):
     dataLen = header[2]
     if (header[1] == OPTYPE.RPI_IMAGE.value):
       # One byte length doesn't work for big images so use as resolution flag
-      resDims = tupleForResolution(header[2])
-      dataLen = resDims[0] * resDims[1] * 3
+      if header[2] == IMRES.R640x480.value:
+        dataLen = 640 * 480 * 3
+      elif header[2] == IMRES.R1280x720.value:
+        dataLen = 1280 * 720 * 3
+      elif header[2] == IMRES.R1920x1088.value:
+        dataLen = 1920 * 1088 * 3
+      else:
+        raise Exception('Invalid length for RPI_IMAGE packet: ' + str(header[2]))
     if dataLen > 0:
       data = self._connection.read(dataLen)
       data = list(data)
@@ -174,6 +176,7 @@ class RoverController(metaclass=Singleton):
       if OPCODE(p[0]) in invalidReceiveOpCodes:
         raise Exception('Received invalid opcode: ' + OPCODE(p[0]).name)
       p = self.readPacket(True, timeout)
+      print('Reading packet: ' + str(p))
       if not p:
         raise Exception('Timeout waiting for packet')
 

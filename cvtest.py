@@ -6,7 +6,7 @@ import cv2
 from micromelon import *
 
 camera = PiCamera()
-res = tupleForResolution(IMRES.R640x480)
+res = (640, 480) # (1280, 720) (1920, 1088)
 camera.resolution = res
 rawCapture = PiRGBArray(camera)
 print('Starting')

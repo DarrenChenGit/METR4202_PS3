@@ -12,7 +12,6 @@ from . import servos as Servos
 from . import sounds as Sounds
 from . import ultrasonic as Ultrasonic
 from ._utils import isBetween, constrain, scale
-from .comms_constants import tupleForResolution
 
 CS = Colour.CS
 NOTES = Sounds.NOTES
@@ -38,5 +37,4 @@ __all__ = [
   'constrain',
   'scale',
   'IMRES',
-  'tupleForResolution',
 ]

@@ -4,8 +4,8 @@ import time
 from pyzbar import pyzbar
 
 from micromelon import *
-rc = RoverController()
-rc.connectIP()
+#rc = RoverController()
+#rc.connectIP()
 
 # Global variable
 
@@ -110,8 +110,10 @@ def qrcodefunction(image):
         cv2.circle(image, (x + int(round(w/2)), y + int(round(h/2))), 5, G, -1)
         print('Inside the area')
 
+    distance = None
     if h == 0:
         print('')
+
     else:
         distance = (knownwidth*focal)/h
         print('mid point of qr code =', x+(w/2))
@@ -124,6 +126,12 @@ def qrcodefunction(image):
         print('')
         print('')
         print('')
+    #Darren: Adding some code so function returns some value.
+    if x == 0: #No QR
+        return None
+
+    else:
+        return distance
         
 def middlearea(image, res, delta):
     
@@ -136,14 +144,14 @@ def middlearea(image, res, delta):
     cv2.line(image, (minrange,0), (minrange,int(res[1])), B, 1)
     cv2.line(image, (maxrange,0), (maxrange,int(res[1])), B, 1)
 
-def main():
-    i = 0
-    image = 0
-    image = getimage(res)
-    qrcodefunction(image)
-    middlearea(image, res, delta)
-    cv2.imshow('image', image)
-    cv2.waitKey(1000)  
+# def main():
+#     i = 0
+#     image = 0
+#     image = getimage(res)
+#     qrcodefunction(image)
+#     middlearea(image, res, delta)
+#     cv2.imshow('image', image)
+#     cv2.waitKey(1000)  
     
-while True:
-    main()
+# while True:
+#     main()

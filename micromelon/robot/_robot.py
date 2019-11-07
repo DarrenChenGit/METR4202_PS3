@@ -1,5 +1,5 @@
 from .._rover_controller import RoverController
-from ..comms_constants import MicromelonType as OPTYPE, MicromelonImageResolution as IMRES, tupleForResolution
+from ..comms_constants import MicromelonType as OPTYPE, MicromelonImageResolution as IMRES
 from .._binary import bytesToAsciiString, stringToBytes, bytesToIntArray
 import numpy
 
@@ -64,8 +64,14 @@ def getImageCapture(resolution):
   else:
     resolution = IMRES(resolution)
 
+  if resVal < 1 or resVal > 3:
+    raise Exception('Resolution must be 1, 2, or 3 for (640 x 480), (1280 x 720), (1920 x 1088) respectively')
   image = _rc.readAttribute(OPTYPE.RPI_IMAGE, [resVal])
-  resDims = tupleForResolution(resolution)
-  image = numpy.reshape(image, (resDims[1], resDims[0], 3))
+  if resolution == IMRES.R640x480:
+    image = numpy.reshape(image, (480, 640, 3))
+  elif resolution == IMRES.R1280x720:
+    image = numpy.reshape(image, (720, 1280, 3))
+  else:
+    image = numpy.reshape(image, (1088, 1920, 3))
   return image
 

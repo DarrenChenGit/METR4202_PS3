@@ -9,7 +9,7 @@ from picamera.array import PiRGBArray
 from picamera import PiCamera
 
 from micromelon import *
-from micromelon.comms_constants import MicromelonOpCode as OPCODE, MicromelonType as OPTYPE, MicromelonImageResolution as IMRES, tupleForResolution
+from micromelon.comms_constants import MicromelonOpCode as OPCODE, MicromelonType as OPTYPE, MicromelonImageResolution as IMRES
 
 KEEP_ALIVE_INTERVAL_SECS = 5.0
 
@@ -18,7 +18,7 @@ if len(sys.argv) == 2:
   port = int(sys.argv[1])
 
 camera = PiCamera()
-res = tupleForResolution(IMRES.R640x480)
+res = (640, 480) # (1280, 720) (1920, 1088)
 camera.resolution = res
 rawCapture = PiRGBArray(camera)
 print('Starting')
@@ -47,9 +47,14 @@ def captureImage(res):
   if not isinstance(res, IMRES):
     res = IMRES(res)
   
-  camera.resolution = tupleForResolution(res)
+  if res == IMRES.R640x480:
+    camera.resolution = (640, 480)
+  elif res == IMRES.R1280x720:
+    camera.resolution = (1280, 720)
+  elif res == IMRES.R1920x1088:
+    camera.resolution = (1920, 1088)
 
-  camera.capture(rawCapture, format="bgr", use_video_port=True)
+  camera.capture(rawCapture, format="bgr")
   image = rawCapture.array
   return image.astype(numpy.uint8)
 

@@ -1,7 +1,8 @@
 import math as m
 import numpy
 import enum
-import time 
+import time
+import thing
 from map import Map
 from micromelon import *
 
@@ -13,7 +14,6 @@ class Turn(enum.Enum):
 
 class State(enum.Enum):
     Explore = 0
-    QRFound = 1
     Returning = 2
 
 class myRobot:
@@ -31,7 +31,19 @@ class myRobot:
         #self.map.grids[int(self.y)][int(self.x)] = 1
         self.dest = [90,195]
         self.obstacles = []
+        self.QRFound = False
+
+#ROBOT SETTINGS
+    def set_dest(self, x, y):
+        self.dest = [x, y]
+
+    def set_turn_speed(self, speed):
+        self.turnSpeed = speed
+
+    def set_speed(self, speed):
+        self.speed = speed
         
+#MOVEMENT FUNCTIONS
 
     #Integrated function that uses Motors and Map to update location.
     #Convention:
@@ -70,6 +82,56 @@ class myRobot:
         self.update_position(distance, self.orientation)
         self.map.mark_robot_pos(self.x , self.y, self.orientation)
 
+    def ir_pass(self, turn):
+        if turn == 1: #left
+            while IR.readLeft() < 15:
+                #if Ultrasonic.read() > 7:
+                #    self.move_forward(2)
+                self.move_forward(3)
+            self.move_forward(10)
+            #x = 0
+            #while x < 10:
+            #    if Ultrasonic.read() < 7:
+            #        self.move_forward(2)
+            #        x = x+2
+        elif turn == 2:
+            while IR.readRight() < 15:
+            #    if Ultrasonic.read() > 7:
+                self.move_forward(3)
+            self.move_forward(10)
+            #x = 0
+            #while x < 10:
+            #    if Ultrasonic.read() < 7:
+            #        self.move_forward(2)
+            #        x = x+2
+
+
+    #Avoid an obstacle by turning left/right then moving away.
+    def avoid_obstacle(self):
+        left = 1
+        right = 2
+        leftReading = IR.readLeft()
+        rightReading = IR.readRight()
+        if self.x < 100:
+            if rightReading > 25:
+                self.turn_robot(90)
+                self.ir_pass(right)
+
+            elif leftReading >25:
+                self.turn_robot(-90)
+                self.ir_pass(left)
+            else:
+                self.move_forward(-10)
+        elif leftReading >25:
+            self.turn_robot(-90)
+            self.ir_pass(left)
+        elif rightReading >25:
+            self.turn_robot(90)
+            self.ir_pass(right)
+        else:
+            self.move_forward(-10)
+
+#MAPPING FUNCTIONS
     def update_position(self, distance, orientation):
         angle_rad = m.radians(orientation)
         x = distance * m.cos(angle_rad)
@@ -79,8 +141,15 @@ class myRobot:
         self.orientation = orientation
         self.map.mark_location(self.x, self.y, 1)
 
-    def get_turn_priority(self):
-        return self.turn.name
+    def determine_turn(self):
+        #TO be filled
+        #IR Clearance to be around 8 at minimum.
+        return Turn.Left
+
+    #Is the robot near its destination?
+    def is_near_destination(self):
+        #Check if the robot is within a size 10(note size = 5 * 2) square of the objective.
+        return self.map.is_point_in_sqr_radius(self.dest[0], self.dest[1], self.x, self.y, 5)
 
     def sweep(self, increment = 5, coneAngle = 50):
         #Turn left 90 degrees. Then start the sweep.
@@ -95,10 +164,18 @@ class myRobot:
         skip_angle = 20
         skip_set = 0
         while 1:
+            #We hit the maximum angle.
             if angle >= coneAngle:
                 break
             
             distance = Ultrasonic.read() + 6
+            QR_dist = None
+
+            if (not self.QRFound):
+                image = Robot.getImageCapture(IMRES.R1920x1088)
+                QR_dist = thing.qrcodefunction(image)
+                if (QR_dist):
+                    self.QRFound = True
             
             index = int(angle/increment)
             if (distance <= 40):
@@ -179,36 +256,6 @@ class myRobot:
 
         return angle
 
-    def set_dest(self, x, y):
-        self.dest = [x, y]
-
-    #Avoid an obstacle by turning left/right then moving away.
-    def avoid_obstacle(self):
-        left = 1
-        right = 2
-        leftReading = IR.readLeft()
-        rightReading = IR.readRight()
-        if self.x < 100:
-            if rightReading > 25:
-                self.turn_robot(90)
-                self.ir_pass(right)
-
-            elif leftReading >25:
-                self.turn_robot(-90)
-                self.ir_pass(left)
-            else:
-                self.move_forward(-10)
-        elif leftReading >25:
-            self.turn_robot(-90)
-            self.ir_pass(left)
-        elif rightReading >25:
-            self.turn_robot(90)
-            self.ir_pass(right)
-        else:
-            self.move_forward(-10)
-
-        
-
         #if (leftReading > 10):
         #    self.turn = Turn.Left
         #    self.turn_robot(-90)
@@ -223,29 +270,7 @@ class myRobot:
         #    #We might wanna reverse.
         #    self.move_forward(-10)
 
-    def ir_pass(self, turn):
-        if turn == 1: #left
-            while IR.readLeft() < 15:
-                #if Ultrasonic.read() > 7:
-                #    self.move_forward(2)
-                self.move_forward(3)
-            self.move_forward(10)
-            #x = 0
-            #while x < 10:
-            #    if Ultrasonic.read() < 7:
-            #        self.move_forward(2)
-            #        x = x+2
-        elif turn == 2:
-            while IR.readRight() < 15:
-            #    if Ultrasonic.read() > 7:
-                self.move_forward(3)
-            self.move_forward(10)
-            #x = 0
-            #while x < 10:
-            #    if Ultrasonic.read() < 7:
-            #        self.move_forward(2)
-            #        x = x+2
-
+    
 
 
     #Continuous move.
@@ -307,22 +332,19 @@ if (run):
     
     rc = RoverController()
     rc.connectIP()
-    #R.ultrasound_sweep(60, 30)
+    R.sweep(20, 80)
    
     #R.ir_sweep(120, 10)
-    #while 1:
-    #    R.cont_move()
-    #    R.avoid_obstacle
-    while 1:
-        R.face_objective()
-        R.sweep()
-        R.face_objective()
+    # while 1:
+    #     R.face_objective()
+    #     R.sweep()
+    #     R.face_objective()
         
-        if R.check_collision():
-            D = R.check_collision()
-            R.move_forward(D-5)
-            R.avoid_obstacle()
+    #     if R.check_collision():
+    #         D = R.check_collision()
+    #         R.move_forward(D-5)
+    #         R.avoid_obstacle()
        
 
-        else:
-            R.move_forward(25)
+    #     else:
+    #         R.move_forward(25)
