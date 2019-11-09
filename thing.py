@@ -1,6 +1,7 @@
 import numpy
 import cv2
 import time
+import myRobot
 from pyzbar import pyzbar
 
 from micromelon import *
@@ -149,14 +150,14 @@ def movecamtomid(results):
     
     if results[1] > 0: # qrcentre is left side of camera
         while qrcentre > maxrange: # qrcentre outside mid area
-            Motors.turnDegrees(5,-15) # Left turn
+            myRobot.turn_robot(-10) # Left turn
             image = getimage(res)
             results = qrcodefuntion(image)
             qrcentre = results[2]
             
     elif results[1] < 0: # qrcentre is right side of camera
         while qrcentre < minrange: # qrcentre outside mid area
-            Motors.turnDegrees(5,15) # Right turn
+            myRobot.turn_robot(10) # Right turn
             image = getimage(res)
             results = qrcodefuntion(image)
             qrcentre = results[2]
