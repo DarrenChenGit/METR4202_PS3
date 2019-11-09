@@ -6,7 +6,7 @@ import thing
 from map import Map
 from micromelon import *
 
-run = 0
+run = 1
 
 class Turn(enum.Enum):
     Left = 1
@@ -17,7 +17,7 @@ class State(enum.Enum):
     Returning = 2
 
 class myRobot:
-    def __init__(self, turn, x_size = 200, y_size = 200, speed = 3, turnSpeed = 4, orientation = 90):
+    def __init__(self, turn, x_size = 200, y_size = 200, speed = 2, turnSpeed = 8, orientation = 90):
         self.x = int(x_size/2)
         self.y = int(21)
         self.orientation = orientation #Orientation w.r.t to world coordinates.
@@ -27,8 +27,6 @@ class myRobot:
         self.map = Map(x_size, y_size)
         self.map.mark_robot_pos(self.x,self.y,orientation)
         self.state = State.Explore
-        #self.map.mark_location(self.x,self.y,1)
-        #self.map.grids[int(self.y)][int(self.x)] = 1
         self.dest = [90,195]
         self.obstacles = []
         self.QRFound = False
@@ -58,11 +56,9 @@ class myRobot:
         delay = ((2 * m.pi * 8) * (abs(degrees)/360)) / self.turnSpeed 
         self.orientation -= degrees
         if run:
-            if degrees == 5:
-                Motors.turnDegrees(7.5, self.turnSpeed)
-            else:
-                Motors.turnDegrees(degrees, self.turnSpeed)
-            time.sleep(delay + 0.5)
+            
+            Motors.turnDegrees(degrees, self.turnSpeed)
+            time.sleep(delay + 0.1)
         #Mark the robot position.
         self.map.mark_robot_pos(self.x , self.y, self.orientation)
 
@@ -177,8 +173,10 @@ class myRobot:
             QR_dist = None
 
             if (not self.QRFound):
-                image = Robot.getImageCapture(IMRES.R1920x1088)
+                image = thing.getimage((1920, 1088))
                 QR_dist = thing.qrcodefunction(image)
+                #For testing please remove later.
+                self.move_forward(QR_dist - 10)
                 if (QR_dist):
                     self.QRFound = True
             
@@ -211,7 +209,7 @@ class myRobot:
                 skip_set = 1
             
 
-            R.map.display_map()
+            #R.map.display_map()
             time.sleep(.8)
 
     #Sweep using the left IR sensor.
@@ -339,8 +337,10 @@ if (run):
     
     rc = RoverController()
     rc.connectIP()
-    R.sweep(20, 80)
-   
+    for x in range (0, 180, 20):
+        #Motors.turnDegrees(15)
+        R.turn_robot(20)
+        #time.sleep(0.5)
     #R.ir_sweep(120, 10)
     # while 1:
     #     R.face_objective()

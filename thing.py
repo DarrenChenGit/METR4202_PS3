@@ -1,6 +1,7 @@
 import numpy
 import cv2
 import time
+import math as m
 from pyzbar import pyzbar
 
 from micromelon import *
@@ -49,6 +50,8 @@ def adbinarize(image):
 
 def qrcodefunction(image):
     
+    cv2.imshow('image', image)
+    cv2.waitKey(1000)
     # Scan normal image for qr code
     barcodes = pyzbar.decode(image)
 
@@ -131,7 +134,11 @@ def qrcodefunction(image):
         return None
 
     else:
-        return distance
+        widthX = (50 * dif * distance)/(96 * 615)
+        angle = m.degrees(m.asin(widthX/distance))
+        print("Angle: ", angle, ", Width: ", widthX)
+        
+        return (distance, angle)
         
 def middlearea(image, res, delta):
     
