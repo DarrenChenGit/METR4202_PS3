@@ -118,7 +118,7 @@ def qrcodefunction(image):
                
     if h == 0:
         print('')
-        return 0
+        return results #[0,-res/2,0,mid-delta,mid+delta]
     else:
         distance = (knownwidth*focal)/h
         print('mid point of qr code =', x+(w/2))
@@ -147,21 +147,21 @@ def movecamtomid(results):
     minrange = results[3]
     maxrange = results[4]
     
-    if results[1] > 0: # qrcentre is +ve away from mid
+    if results[1] > 0: # qrcentre is left side of camera
         while qrcentre > maxrange: # qrcentre outside mid area
             Motors.turnDegrees(5,-15) # Left turn
             image = getimage(res)
             results = qrcodefuntion(image)
             qrcentre = results[2]
             
-    elif results[1] < 0: # qrcentre is -ve away from mid
+    elif results[1] < 0: # qrcentre is right side of camera
         while qrcentre < minrange: # qrcentre outside mid area
             Motors.turnDegrees(5,15) # Right turn
             image = getimage(res)
             results = qrcodefuntion(image)
             qrcentre = results[2]
             
-    else: # qrcentre is in the mid area
+    else: # No qr code
         return None
         
         
