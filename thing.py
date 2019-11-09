@@ -110,10 +110,15 @@ def qrcodefunction(image):
         cv2.circle(image, (x + int(round(w/2)), y + int(round(h/2))), 5, G, -1)
         print('Inside the area')
 
-    distance = None
+    distance = 0
+    qrcentre = 0
+    
+    qrcentre = x + w/2
+    results = [distance,dif,qrcentre,mid-delta,mid+delta]
+               
     if h == 0:
         print('')
-
+        return 0
     else:
         distance = (knownwidth*focal)/h
         print('mid point of qr code =', x+(w/2))
@@ -126,12 +131,39 @@ def qrcodefunction(image):
         print('')
         print('')
         print('')
+        return results
+        
     #Darren: Adding some code so function returns some value.
-    if x == 0: #No QR
-        return None
+    #if x == 0: #No QR
+     #   return None
 
-    else:
-        return distance
+    #else:
+     #   return distance
+    
+def movecamtomid(results):
+    # move camera to position rover straight at qrcode
+    dif = results[1]
+    qrcentre = results[2]
+    minrange = results[3]
+    maxrange = results[4]
+    
+    if results[1] > 0: # qrcentre is +ve away from mid
+        while qrcentre > maxrange: # qrcentre outside mid area
+            Motors.turnDegrees(5,-15) # Left turn
+            image = getimage(res)
+            results = qrcodefuntion(image)
+            qrcentre = results[2]
+            
+    elif results[1] < 0: # qrcentre is -ve away from mid
+        while qrcentre < minrange: # qrcentre outside mid area
+            Motors.turnDegrees(5,15) # Right turn
+            image = getimage(res)
+            results = qrcodefuntion(image)
+            qrcentre = results[2]
+            
+    else: # qrcentre is in the mid area
+        return None
+        
         
 def middlearea(image, res, delta):
     
