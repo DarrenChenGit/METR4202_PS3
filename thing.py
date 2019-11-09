@@ -184,6 +184,4 @@ def middlearea(image, res, delta):
 #     middlearea(image, res, delta)
 #     cv2.imshow('image', image)
 #     cv2.waitKey(1000)  
-    
-# while True:
-#     main()
+
