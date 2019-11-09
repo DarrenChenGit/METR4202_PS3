@@ -6,7 +6,7 @@ import thing
 from map import Map
 from micromelon import *
 
-run = 1
+run = 0
 
 class Turn(enum.Enum):
     Left = 1
@@ -42,6 +42,11 @@ class myRobot:
 
     def set_speed(self, speed):
         self.speed = speed
+
+#GET FUNCTIONS
+    def get_pos(self):
+        print("Robot at ", self.x, " ", self.y, " ", "orientation: ", self.orientation)
+        return (self.x, self.y, self.orientation)
         
 #MOVEMENT FUNCTIONS
 
@@ -275,11 +280,12 @@ class myRobot:
 
     #Continuous move.
     def cont_move(self):
-        dist = Ultrasonic.read()
-        while (dist > 10):
+        self.sweep()
+        dist = self.check_collision()
+        while (dist > 10 or dist == None):
             #Check if robot is currently in bounds.
             if ((0 < self.x < self.map.x_length) and (0 < self.y < self.map.y_length)):
-                if dist > 50:
+                if dist == None:
                     self.move_forward(25)
 
                 #We want to check the sides of robots when we are this close.
@@ -291,7 +297,8 @@ class myRobot:
                 
             else:
                 break
-            dist = Ultrasonic.read()
+            self.sweep()
+            dist = self.check_collision()
 
 
     def face_objective(self):
