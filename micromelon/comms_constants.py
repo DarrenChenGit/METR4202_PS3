@@ -62,20 +62,7 @@ class MicromelonType(Enum):
   NETWORK_KEEP_ALIVE = 151
 
 class MicromelonImageResolution(Enum):
-  R320x240 = 1
-  R640x480 = 2
-  R1280x720 = 3
-  R1920x1088 = 4
+  R640x480 = 1
+  R1280x720 = 2
+  R1920x1088 = 3
 
-def tupleForResolution(res):
-  if not isinstance(res, MicromelonImageResolution):
-    res = MicromelonImageResolution(res)
-  if res == MicromelonImageResolution.R320x240:
-    return (320, 240)
-  if res == MicromelonImageResolution.R640x480:
-    return (640, 480)
-  if res == MicromelonImageResolution.R1280x720:
-    return (1280, 720)
-  if res == MicromelonImageResolution.R1920x1088:
-    return (1920, 1088)
-  return (320, 240)
