@@ -59,7 +59,8 @@ class myRobot:
         delay = ((2 * m.pi * 8) * (abs(degrees)/360)) / self.turnSpeed 
         self.orientation -= degrees
         if run:
-            
+            if abs(degrees) == 5:
+                degrees = degrees*1.2
             Motors.turnDegrees(degrees, self.turnSpeed)
             time.sleep(delay + 0.1)
         #Mark the robot position.
@@ -139,7 +140,7 @@ class myRobot:
 
     def IR_read(self,sensor):
         if sensor == Turn.Right:
-            return IR.readright()
+            return IR.readRight()
         if sensor == Turn.Left:
             return IR.readleft()
 
