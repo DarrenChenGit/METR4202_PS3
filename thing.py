@@ -32,9 +32,7 @@ def getimage(res):
     image = image.astype(numpy.uint8)
     return image
 
-def Canny(image):
-    edges = cv2.Canny(image,25,125)
-    return edges
+
 
 def grayscale(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -50,8 +48,8 @@ def adbinarize(image):
 
 def qrcodefunction(image):
     
-    cv2.imshow('image', image)
-    cv2.waitKey(1000)
+    #cv2.imshow('image', image)
+    #cv2.waitKey(1000)
     # Scan normal image for qr code
     barcodes = pyzbar.decode(image)
 
@@ -62,10 +60,10 @@ def qrcodefunction(image):
     h = 0
 
     # camera calibration
-    knownwidth = 7 #cm
-    knowndistance = 30 #cm
-    knowpixelwidth = 425
-    focal = (knowpixelwidth*knowndistance)/knownwidth
+    knownheight = 7.5 #cm
+    knowndistance = 108 #cm
+    knowpixelheight = 128
+    focal = (knowpixelheight*knowndistance)/knownheight
 
     # binary image
     gray = grayscale(image)
@@ -118,23 +116,24 @@ def qrcodefunction(image):
         print('')
 
     else:
-        distance = (knownwidth*focal)/h
-        print('mid point of qr code =', x+(w/2))
-        print('horizontal distance from center = ',dif)
-        print('x =', x)
-        print('y =', y)
-        print('w =', w)
-        print('h =', h)
-        print('qr code distance =', distance)
-        print('')
-        print('')
-        print('')
+        distance = (knownheight*focal)/h
+        #print('mid point of qr code =', x+(w/2))
+        #print('horizontal distance from center = ',dif)
+        #print('x =', x)
+        #print('y =', y)
+        #print('w =', w)
+        #print('h =', h)
+        #print('qr code distance =', distance)
+        #print('')
+        #print('')
+        #print('')
     #Darren: Adding some code so function returns some value.
     if x == 0: #No QR
         return None
 
     else:
-        widthX = (50 * dif * distance)/(96 * 615)
+        
+        widthX = (23 * (122+dif) * distance)/(82.2857*(122+180))/1.8
         angle = m.degrees(m.asin(widthX/distance))
         print("Angle: ", angle, ", Width: ", widthX)
         

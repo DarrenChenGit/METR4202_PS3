@@ -337,10 +337,13 @@ if (run):
     
     rc = RoverController()
     rc.connectIP()
-    for x in range (0, 180, 20):
-        #Motors.turnDegrees(15)
-        R.turn_robot(20)
-        #time.sleep(0.5)
+    while 1:
+        image = thing.getimage((1920, 1088))
+        code = thing.qrcodefunction(image)
+
+        if code:
+            R.turn_robot(code[1])
+        
     #R.ir_sweep(120, 10)
     # while 1:
     #     R.face_objective()
