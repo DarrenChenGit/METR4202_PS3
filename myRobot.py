@@ -11,6 +11,8 @@ run = 1
 class Turn(enum.Enum):
     Left = 1
     Right = 2
+    Back = 3
+    BackLeft = 4
 
 class State(enum.Enum):
     Explore = 0
@@ -30,6 +32,7 @@ class myRobot:
         self.dest = [90,195]
         self.obstacles = []
         self.QRFound = False
+        self.turn_state = 0
 
 #ROBOT SETTINGS
     def set_dest(self, x, y):
@@ -109,28 +112,73 @@ class myRobot:
 
     #Avoid an obstacle by turning left/right then moving away.
     def avoid_obstacle(self):
-        left = 1
-        right = 2
+       while(1):
+        direction = self.get_turn_priority()
+        if direction == Turn.Left:
+            self.turn_robot(-90)
+            sensor = Turn.Right
+        if direction == Turn.Right:
+            self.turn_robot(90)
+            sensor = Turn.Left
+        if direction == Turn.Back:
+            self.move_forward(-15)
+            self.get_turn_priority()
+        
+        while Ultrasonic.read() > 5:
+            if self.IR_read(sensor) > 10:
+                a = 0
+                while Ultrasonic.read() > 5:
+                    self.move_forward(2)
+                    a = a +2
+                    if a >= 10:
+                        return
+                return
+            self.move_forward(2)
+        return
+                    
+
+    def IR_read(self,sensor):
+        if sensor == Turn.Right:
+            return IR.readright()
+        if sensor == Turn.Left:
+            return IR.readleft()
+
+
+    def get_turn_priority(self):
+        
         leftReading = IR.readLeft()
         rightReading = IR.readRight()
-        if self.x < 100:
-            if rightReading > 25:
-                self.turn_robot(90)
-                self.ir_pass(right)
 
-            elif leftReading >25:
-                self.turn_robot(-90)
-                self.ir_pass(left)
+        if leftReading < 20:
+            if rightReading  < 20:
+                self.turn_state == Turn.Back
+                return Turn.Back
             else:
-                self.move_forward(-10)
-        elif leftReading >25:
-            self.turn_robot(-90)
-            self.ir_pass(left)
-        elif rightReading >25:
-            self.turn_robot(90)
-            self.ir_pass(right)
-        else:
-            self.move_forward(-10)
+                if self.turn_state == Turn.Left:
+                    self.turn_state = Turn.Back
+                    return Turn.Back
+                else:
+                    self.turn_state = Turn.Right
+                    return Turn.Right
+        else: 
+            if rightReading > 20:
+                if self.x > self.dest[0]:
+                    self.turn_state = Turn.Left
+                    return Turn.Left
+                else:
+                    self.turn_state = Turn.Right
+                    return Turn.Right
+            else: 
+                if self.turn_state == Turn.Right:
+                    self.turn_state = Turn.Back
+                    return Turn.Back
+                else: 
+                    self.turn_state = Turn.Left
+                    return Turn.Left
+
+
+
+        
 
 #MAPPING FUNCTIONS
     def update_position(self, distance, orientation):
@@ -154,10 +202,9 @@ class myRobot:
 
     def sweep(self, increment = 5, coneAngle = 50):
         #Turn left 90 degrees. Then start the sweep.
-        Motors.turnDegrees(-coneAngle/2,4)
-        time.sleep(3)
-        self.update_position(0, self.orientation+coneAngle/2)
-        R.map.mark_robot_pos(self.x , self.y, self.orientation)
+        self.turn_robot(-coneAngle/2)
+        #self.QR_scan()
+       
         
         
         distance = 0
@@ -172,13 +219,13 @@ class myRobot:
             distance = Ultrasonic.read() + 6
             QR_dist = None
 
-            if (not self.QRFound):
-                image = thing.getimage((1920, 1088))
-                QR_dist = thing.qrcodefunction(image)
-                #For testing please remove later.
-                self.move_forward(QR_dist - 10)
-                if (QR_dist):
-                    self.QRFound = True
+            #if (not self.QRFound):
+            #    image = thing.getimage((1920, 1088))
+            #    QR_dist = thing.qrcodefunction(image)
+            #    #For testing please remove later.
+            #    self.move_forward(QR_dist - 10)
+            #    if (QR_dist):
+            #        self.QRFound = True
             
             index = int(angle/increment)
             if (distance <= 40):
@@ -209,8 +256,9 @@ class myRobot:
                 skip_set = 1
             
 
-            #R.map.display_map()
+            R.map.display_map()
             time.sleep(.8)
+        #self.QR_scan()
 
     #Sweep using the left IR sensor.
     def ir_sweep(self, coneAngle, increment):
@@ -305,6 +353,14 @@ class myRobot:
             return
         self.turn_robot(self.orientation-self.get_dest_angle())
 
+
+    def QR_scan(self):
+        image = thing.getimage((1920, 1088))
+        code = thing.qrcodefunction(image)
+        if code:
+            self.dest = [self.x+code[0]*m.cos(self.orientation-code[1]),self.y + code[0]*m.sin(self.orientation-code[1])]
+            self.map.mark_location(self.dest[0],self.dest[1],4)
+
     def move_to_objective(self):
         return 0
 
@@ -337,24 +393,24 @@ if (run):
     
     rc = RoverController()
     rc.connectIP()
-    while 1:
-        image = thing.getimage((1920, 1088))
-        code = thing.qrcodefunction(image)
+    #while 1:
+    #    image = thing.getimage((1920, 1088))
+    #    code = thing.qrcodefunction(image)
 
-        if code:
-            R.turn_robot(code[1])
+    #    if code:
+    #        R.turn_robot(code[1])
         
     #R.ir_sweep(120, 10)
-    # while 1:
-    #     R.face_objective()
-    #     R.sweep()
-    #     R.face_objective()
-        
-    #     if R.check_collision():
-    #         D = R.check_collision()
-    #         R.move_forward(D-5)
-    #         R.avoid_obstacle()
+    while 1:
+        R.face_objective()
+        R.sweep()
+        R.face_objective()
        
+        if R.check_collision():
+            D = R.check_collision()
+            R.move_forward(D-5)
+            R.avoid_obstacle()       
 
-    #     else:
-    #         R.move_forward(25)
+        else:
+            R.move_forward(25)
+
