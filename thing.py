@@ -1,19 +1,19 @@
 import numpy
 import cv2
 import time
-import myRobot as mr
+#import myRobot as mr
 from pyzbar import pyzbar
 
 from micromelon import *
-#rc = RoverController()
-#rc.connectIP()
+rc = RoverController()
+rc.connectIP()
 
 # Global variable
 
 # Select image resolution variable
-res = (1920,1080)
-#res = (1280,720)
-#res = (620,480)
+#res = (1920,1080)
+res = (1280,720)
+#res = (640,480)
 
 
 delta = 200
@@ -60,9 +60,9 @@ def qrcodefunction(image):
     h = 0
 
     # camera calibration
-    knownwidth = 7 #cm
-    knowndistance = 30 #cm
-    knowpixelwidth = 425
+    knownwidth = 7.5 #cm
+    knowndistance = 108 #cm
+    knowpixelwidth = 128
     focal = (knowpixelwidth*knowndistance)/knownwidth
 
     # binary image
@@ -114,14 +114,15 @@ def qrcodefunction(image):
     distance = 0
     qrcentre = 0
     
-    qrcentre = x + w/2
     results = [distance,dif,qrcentre,mid-delta,mid+delta]
                
     if h == 0:
         print('')
         return results #[0,-res/2,0,mid-delta,mid+delta]
     else:
+        qrcentre = x + w/2
         distance = (knownwidth*focal)/h
+        results = [distance,dif,qrcentre,mid-delta,mid+delta]
         print('mid point of qr code =', x+(w/2))
         print('horizontal distance from center = ',dif)
         print('x =', x)
@@ -157,7 +158,7 @@ def movecamtomid(results):
             
     elif results[1] < 0: # qrcentre is right side of camera
         while qrcentre < minrange: # qrcentre outside mid area
-            mr.turn_robot(10) # Right turn
+            #mr.turn_robot(10) # Right turn
             image = getimage(res)
             results = qrcodefuntion(image)
             qrcentre = results[2]
@@ -184,5 +185,11 @@ def middlearea(image, res, delta):
 #     qrcodefunction(image)
 #     middlearea(image, res, delta)
 #     cv2.imshow('image', image)
-#     cv2.waitKey(1000)  
+#     cv2.waitKey(1000)
+#def main():
+ #   image = getimage(res)
+  #  qrcodefunction(image)
 
+#while True:
+ #   main()
+  #  time.sleep(2)
