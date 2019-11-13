@@ -1,19 +1,19 @@
 import numpy
 import cv2
 import time
-import math as m
+#import myRobot as mr
 from pyzbar import pyzbar
 
 from micromelon import *
-#rc = RoverController()
-#rc.connectIP()
+rc = RoverController()
+rc.connectIP()
 
 # Global variable
 
 # Select image resolution variable
-res = (1920,1080)
-#res = (1280,720)
-#res = (620,480)
+#res = (1920,1080)
+res = (1280,720)
+#res = (640,480)
 
 
 delta = 200
@@ -32,7 +32,9 @@ def getimage(res):
     image = image.astype(numpy.uint8)
     return image
 
-
+def Canny(image):
+    edges = cv2.Canny(image,25,125)
+    return edges
 
 def grayscale(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -48,8 +50,6 @@ def adbinarize(image):
 
 def qrcodefunction(image):
     
-    #cv2.imshow('image', image)
-    #cv2.waitKey(1000)
     # Scan normal image for qr code
     barcodes = pyzbar.decode(image)
 
@@ -60,10 +60,10 @@ def qrcodefunction(image):
     h = 0
 
     # camera calibration
-    knownheight = 7.5 #cm
+    knownwidth = 7.5 #cm
     knowndistance = 108 #cm
-    knowpixelheight = 128
-    focal = (knowpixelheight*knowndistance)/knownheight
+    knowpixelwidth = 128
+    focal = (knowpixelwidth*knowndistance)/knownwidth
 
     # binary image
     gray = grayscale(image)
@@ -111,33 +111,61 @@ def qrcodefunction(image):
         cv2.circle(image, (x + int(round(w/2)), y + int(round(h/2))), 5, G, -1)
         print('Inside the area')
 
-    distance = None
+    distance = 0
+    qrcentre = 0
+    
+    results = [distance,dif,qrcentre,mid-delta,mid+delta]
+               
     if h == 0:
         print('')
-
+        return results #[0,-res/2,0,mid-delta,mid+delta]
     else:
-        distance = (knownheight*focal)/h
-        #print('mid point of qr code =', x+(w/2))
-        #print('horizontal distance from center = ',dif)
-        #print('x =', x)
-        #print('y =', y)
-        #print('w =', w)
-        #print('h =', h)
-        #print('qr code distance =', distance)
-        #print('')
-        #print('')
-        #print('')
+        qrcentre = x + w/2
+        distance = (knownwidth*focal)/h
+        results = [distance,dif,qrcentre,mid-delta,mid+delta]
+        print('mid point of qr code =', x+(w/2))
+        print('horizontal distance from center = ',dif)
+        print('x =', x)
+        print('y =', y)
+        print('w =', w)
+        print('h =', h)
+        print('qr code distance =', distance)
+        print('')
+        print('')
+        print('')
+        return results
+        
     #Darren: Adding some code so function returns some value.
-    if x == 0: #No QR
-        return None
+    #if x == 0: #No QR
+     #   return None
 
-    else:
+    #else:
+     #   return distance
+    
+def movecamtomid(results):
+    # move camera to position rover straight at qrcode
+    dif = results[1]
+    qrcentre = results[2]
+    minrange = results[3]
+    maxrange = results[4]
+    
+    if results[1] > 0: # qrcentre is left side of camera
+        while qrcentre > maxrange: # qrcentre outside mid area
+            mr.turn_robot(-10) # Left turn
+            image = getimage(res)
+            results = qrcodefuntion(image)
+            qrcentre = results[2]
+            
+    elif results[1] < 0: # qrcentre is right side of camera
+        while qrcentre < minrange: # qrcentre outside mid area
+            #mr.turn_robot(10) # Right turn
+            image = getimage(res)
+            results = qrcodefuntion(image)
+            qrcentre = results[2]
+            
+    else: # No qr code
+        return None
         
-        widthX = (23 * (122+dif) * distance)/(82.2857*(122+180))/1.8
-        angle = m.degrees(m.asin(widthX/distance))
-        print("Angle: ", angle, ", Width: ", widthX)
-        
-        return (distance, angle)
         
 def middlearea(image, res, delta):
     
@@ -157,7 +185,11 @@ def middlearea(image, res, delta):
 #     qrcodefunction(image)
 #     middlearea(image, res, delta)
 #     cv2.imshow('image', image)
-#     cv2.waitKey(1000)  
-    
-# while True:
-#     main()
+#     cv2.waitKey(1000)
+#def main():
+ #   image = getimage(res)
+  #  qrcodefunction(image)
+
+#while True:
+ #   main()
+  #  time.sleep(2)
