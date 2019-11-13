@@ -5,14 +5,14 @@ import time
 from pyzbar import pyzbar
 
 from micromelon import *
-rc = RoverController()
-rc.connectIP()
+# rc = RoverController()
+# rc.connectIP()
 
 # Global variable
 
 # Select image resolution variable
-#res = (1920,1080)
-res = (1280,720)
+res = (1920,1080)
+#res = (1280,720)
 #res = (640,480)
 
 
@@ -48,8 +48,15 @@ def adbinarize(image):
     binary = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,115,1)
     return binary
 
-def qrcodefunction(image):
-    
+def qrcodefunction(res):
+
+    if res[0] == 1920:
+        image = Robot.getImageCapture(IMRES.R1920x1088)
+    if res[0] == 1280:
+        image = Robot.getImageCapture(IMRES.R1280x720)
+    if res[0] == 640:    
+        image = Robot.getImageCapture(IMRES.R640x480)
+    image = image.astype(numpy.uint8)
     # Scan normal image for qr code
     barcodes = pyzbar.decode(image)
 
@@ -62,7 +69,7 @@ def qrcodefunction(image):
     # camera calibration
     knownwidth = 7.5 #cm
     knowndistance = 108 #cm
-    knowpixelwidth = 128
+    knowpixelwidth = 128 # pixel Height
     focal = (knowpixelwidth*knowndistance)/knownwidth
 
     # binary image
@@ -96,7 +103,7 @@ def qrcodefunction(image):
         print('found qr code')
         
     
-    dif = x + w/2 - mid
+    dif = x + w/2 - int(res[0]/2)
     
     # Check if the qr code is in middle area
     
@@ -118,21 +125,23 @@ def qrcodefunction(image):
                
     if h == 0:
         print('')
-        return results #[0,-res/2,0,mid-delta,mid+delta]
+        dif = 0
+        results = [distance,dif,qrcentre,mid-delta,mid+delta]
+        return results #[0,0,0,mid-delta,mid+delta]
     else:
         qrcentre = x + w/2
         distance = (knownwidth*focal)/h
         results = [distance,dif,qrcentre,mid-delta,mid+delta]
         print('mid point of qr code =', x+(w/2))
         print('horizontal distance from center = ',dif)
-        print('x =', x)
-        print('y =', y)
-        print('w =', w)
-        print('h =', h)
+        # print('x =', x)
+        # print('y =', y)
+        # print('w =', w)
+        # print('h =', h)
         print('qr code distance =', distance)
-        print('')
-        print('')
-        print('')
+        # print('')
+        # print('')
+        # print('')
         return results
         
     #Darren: Adding some code so function returns some value.
@@ -141,31 +150,7 @@ def qrcodefunction(image):
 
     #else:
      #   return distance
-    
-def movecamtomid(results):
-    # move camera to position rover straight at qrcode
-    dif = results[1]
-    qrcentre = results[2]
-    minrange = results[3]
-    maxrange = results[4]
-    
-    if results[1] > 0: # qrcentre is left side of camera
-        while qrcentre > maxrange: # qrcentre outside mid area
-            mr.turn_robot(-10) # Left turn
-            image = getimage(res)
-            results = qrcodefuntion(image)
-            qrcentre = results[2]
-            
-    elif results[1] < 0: # qrcentre is right side of camera
-        while qrcentre < minrange: # qrcentre outside mid area
-            #mr.turn_robot(10) # Right turn
-            image = getimage(res)
-            results = qrcodefuntion(image)
-            qrcentre = results[2]
-            
-    else: # No qr code
-        return None
-        
+
         
 def middlearea(image, res, delta):
     
