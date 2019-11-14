@@ -180,9 +180,9 @@ def increase_Bri(res):
 
         alpha = 1.2 # Simple contrast control
         beta = 3    # Simple brightness control
-        image = cv2.convertScaleAbs(image,alpha,beta)
+        image = cv2.convertScaleAbs(image,alpha,beta) # Increasse brightness and contrast of normal image (BNI)
 
-        # Scan normal image for qr code
+        # Scan BNI for qr code
         barcodes = pyzbar.decode(image)
 
         # Initialize variable
@@ -212,7 +212,7 @@ def increase_Bri(res):
         if res[0] == 640:    
             focal = focal640p
         
-        # binary image
+        # brighten binary image (BBI)
         gray = grayscale(image)
         bi = adbinarize(gray)
 
@@ -222,23 +222,23 @@ def increase_Bri(res):
             # w = pixel width of qr code
             # h = pixel height of qr code
 
-        # Check if camera found qr code in normal image
+        # Check if camera found qr code in BNI 
     
-        if x == 0: # no qr code found in normal image
+        if x == 0: # no qr code found in BNI
         
-            barcodes = pyzbar.decode(bi) # Try finding qr code in binary image
+            barcodes = pyzbar.decode(bi) # Try finding qr code in BBI
         
             for barcode in barcodes:
                 (x, y, w, h) = barcode.rect
             
-            if x == 0: # no qr code found in binary image
+            if x == 0: # no qr code found in BBI
                 print('No qr code (Bright)')
 
-            else: # Found qr code in binary image
+            else: # Found qr code in BBI
                 #cv2.rectangle(image, (x, y), (x + w, y + h), G, 2)
                 print('found qr code (Bright)')
            
-        else: # Found qr code in normal image
+        else: # Found qr code in BNI
             #cv2.rectangle(image, (x, y), (x + w, y + h), G, 2)
             print('found qr code (Bright)')
         
@@ -265,8 +265,8 @@ def increase_Bri(res):
                
         if h == 0:
             print('')
-            cv2.imshow('assd',image)
-            cv2.waitKey(0)
+            #cv2.imshow('assd',image)
+            #cv2.waitKey(0)
             return results #[0,-res/2,0,mid-delta,mid+delta]
         else:
             qrcentre = x + w/2
@@ -282,8 +282,8 @@ def increase_Bri(res):
             #print('')
             #print('')
             print('')
-            cv2.imshow('assd',image)
-            cv2.waitKey(0)
+            #cv2.imshow('assd',image)
+            #cv2.waitKey(0)
             return results
 
         
