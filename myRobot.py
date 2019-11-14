@@ -177,20 +177,28 @@ class myRobot:
         qrcentre = results[2]
         #While the distance not = 0, when we cant find QR the distance returned by function is 0.
         while results[0] != 0:
-            results = thing.increase_Bri(res)
+            results = thing.qrcodefunction(res)
             if results[0] == 0:
                 break
             else:
                 time.sleep(2)
                 qrcentre = int(results[2])
+                dis = int(results[0])
+                dif = int(results[1])
 
             
             if qrcentre > (mid+delta):
-                self.turn_robot(5)
+                if dis > 50 and abs(dif) - delta < 50:
+                    self.turn_robot(3)
+                else:
+                    self.turn_robot(5)
                 
 
             elif qrcentre < (mid-delta):
-                self.turn_robot(-5)
+                if dis > 50 and abs(dif) - delta < 50:
+                    self.turn_robot(-3)
+                else:
+                    self.turnn_robot(-5)
 
             else:
                 x = self.x + results[0] * m.cos(m.radians(self.orientation))
