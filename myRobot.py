@@ -351,7 +351,7 @@ class myRobot:
             #ATTACK
             print("Attacking objective...")
             self.face_objective()
-            self.move_forward(self.get_dest_distance() - 7)
+            self.move_forward(self.get_dest_distance() - 8)
             self.state = State.Returning
             return False
         
