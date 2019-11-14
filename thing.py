@@ -11,8 +11,8 @@ from micromelon import *
 # Global variable
 
 # Select image resolution variable
-res = (1920,1080)
-#res = (1280,720)
+#res = (1920,1080)
+res = (1280,720)
 #res = (640,480)
 
 
