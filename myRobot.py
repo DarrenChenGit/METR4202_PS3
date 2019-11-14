@@ -324,6 +324,12 @@ class myRobot:
         self.turn_robot(-coneAngle/2)
 
         return angle
+    
+    def YEET(self):
+        while (Ultrasonic.read() > 5):
+            self.move_forward(2)
+        self.move_forward(6)
+
 
     #Continuous move. Returns true if robot returned home.
     def cont_move(self):
@@ -338,10 +344,9 @@ class myRobot:
             print("Now returning")
             self.dest = [self.map.x_length/2, 20]
             #If we are near, park the robot.
-            if (self.is_near_destination()):
+            if (self.get_dest_distance() < 15):
                 self.face_objective()
-                distance = self.get_dest_distance()
-                self.move_forward(distance)
+                self.YEET()
                 return True
                 
         
@@ -351,7 +356,7 @@ class myRobot:
             #ATTACK
             print("Attacking objective...")
             self.face_objective()
-            self.move_forward(self.get_dest_distance() - 8)
+            self.move_forward(self.get_dest_distance() - 9)
             self.state = State.Returning
             return False
         
@@ -359,11 +364,15 @@ class myRobot:
         D = R.check_collision()
         #Obstacle encountered.
         if D:
-            self.move_forward(D-5)
+            self.move_forward(D - 8)
             self.avoid_obstacle()       
 
         else:
-            self.move_forward(30)
+            if self.get_dest_distance() > 30:
+                self.move_forward(30)
+
+            else:
+                self.move_forward(self.get_dest_distance())
 
         return False
 
@@ -391,6 +400,7 @@ class myRobot:
             #self.move_cam_to_mid(code)
             return True
 
+        self.QRFound = False
         return False
 
     def check_collision(self):
