@@ -71,8 +71,9 @@ class myRobot:
 
             if int(abs(degrees)) == 90:
                 degrees = degrees * .95
+                
             Motors.turnDegrees(int(degrees), self.turnSpeed)
-            time.sleep(delay + 0.5)
+            time.sleep(delay + 0.8)
 
         #We can calibrate the stuff.
         #Mark the robot position.
@@ -83,7 +84,7 @@ class myRobot:
         # destX = self.x + distance * m.cos(m.radians(self.orientation))
         # destY = self.y + distance * m.sin(m.radians(self.orientation))
         Motors.moveDistance(distance)
-        time.sleep(abs(distance)/self.speed)
+        time.sleep(3)
         self.update_position(distance, self.orientation)
         self.map.mark_robot_pos(self.x , self.y, self.orientation)
 
@@ -100,8 +101,6 @@ class myRobot:
             #    if Ultrasonic.read() > 7:
                 self.move_forward(3)
             self.move_forward(10)
-            
-
 
     #Avoid an obstacle by turning left/right then moving away.
     def avoid_obstacle(self):
@@ -177,17 +176,18 @@ class myRobot:
         qrcentre = results[2]
         #minrange = results[3]
         #maxrange = results[4]
-        while 1:
+        #While the distance not = 0, when we cant find QR the distance returned by function is 0.
+        while results[0] != 0:
             results = thing.qrcodefunction(res)
-            qrcentre = results[2]
-            if results[0] == 0:
-                break
+            time.sleep(2)
+            qrcentre = int(results[2])
+
             
-            if qrcentre > mid+delta:
+            if qrcentre > (mid+delta):
                 self.turn_robot(7)
                 
 
-            elif qrcentre < mid-delta:
+            elif qrcentre < (mid-delta):
                 self.turn_robot(-7)
 
             else:
@@ -216,7 +216,7 @@ class myRobot:
     #Is the robot near its destination?
     def is_near_destination(self):
         #Check if the robot is within a size 10(note size = 5 * 2) square of the objective.
-        return self.map.is_point_in_sqr_radius(self.dest[0], self.dest[1], self.x, self.y, 20)
+        return self.map.is_point_in_sqr_radius(self.dest[0], self.dest[1], self.x, self.y, 70)
 
     def sweep(self, coneAngle = 50, increment = 5):
         #Turn left 90 degrees. Then start the sweep.
@@ -231,6 +231,12 @@ class myRobot:
         while 1:
             #We hit the maximum angle.
             if angle >= coneAngle:
+                #If we found QR at the right edge of cone.
+                if (not self.QRFound):
+                    #Break only if we found it.
+                    if (self.QR_scan()):
+                        break
+                
                 self.turn_robot(-coneAngle/2)
                 break
             
@@ -263,7 +269,6 @@ class myRobot:
                 skip_set = 1
 
             #R.map.display_map()
-            time.sleep(.5)
         if (not self.QRFound):
             self.QR_scan()
 
@@ -296,6 +301,14 @@ class myRobot:
         else:
             return None
 
+    def get_dest_distance(self):
+        if (self.dest):
+            return self.map.get_dist_angle(self.x, self.y, self.dest[0], self.dest[1])[0]
+
+        else:
+            return None
+
+
     def ultrasound_sweep(self, coneAngle, increment):
         #Turn left.
         self.turn_robot(-coneAngle/2)
@@ -314,21 +327,31 @@ class myRobot:
 
         return angle
 
-    #Continuous move.
+    #Continuous move. Returns true if robot returned home.
     def cont_move(self):
         #Face objective and sweep.
         self.face_objective()
         self.sweep(80)
+
+        #Returning after yeeting the QR flag.
         if (self.state == State.Returning):
             print("Now returning")
             self.dest = [self.map.x_length/2, 20]
+            #If we are near, park the robot.
+            if (self.is_near_destination()):
+                self.face_objective()
+                distance = self.get_dest_distance()
+                self.move_forward(distance)
+                return True
+                
         
         #If we find the QR and we are within some range, we can ram.
-        if (self.QRFound and self.is_near_destination()):
+        elif (self.QRFound and self.is_near_destination()):
             #ATTACK
             print("Attacking objective...")
             self.face_objective()
-            self.move_forward(22)
+            self.QR_scan()
+            self.move_forward(self.get_dest_distance())
             self.state = State.Returning
         
         
@@ -341,6 +364,8 @@ class myRobot:
         else:
             self.move_forward(25)
 
+        return False
+
     def face_objective(self):
         if (not self.dest):
             print("No destination has been set!")
@@ -348,15 +373,16 @@ class myRobot:
         self.turn_robot(self.orientation-self.get_dest_angle())
 
 
+    #Scan for a QR code and try to align to it. Returns true if found,
+    #else returns false for no QR.
     def QR_scan(self):
         code = thing.qrcodefunction(res)
-        if code:
+        if code[0] != 0:
             # self.map.mark_location(self.dest[0],self.dest[1],4)
             self.move_cam_to_mid(code)
-            
+            return True
 
-    def move_to_objective(self):
-        return 0
+        return False
 
     def check_collision(self):
         
@@ -366,7 +392,7 @@ class myRobot:
 
         for a in range(30):
             for b in range(20):
-                if (int(X+a*m.cos(ori_rad)+b*m.cos(ori_rad-m.pi/2)),int(Y+a*m.sin(ori_rad)+b*m.sin(ori_rad-m.pi/2))) in self.obstacles:
+                if (int(X+a*m.cos(ori_rad)+b*m.cos(ori_rad-m.pi/2)), int(Y+ a*m.sin(ori_rad) + b*m.sin(ori_rad-m.pi/2))) in self.obstacles:
                     return a 
         return None
                 
@@ -380,4 +406,9 @@ if (run):
     rc.connectIP()
     
     while 1:
-        R.cont_move()
+        if (R.cont_move()):
+            rc.disarm
+            break
+            print("All done")
+        time.sleep(2)
+        

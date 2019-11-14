@@ -95,11 +95,11 @@ def qrcodefunction(res):
             print('No qr code')
 
         else: # Found qr code in binary image
-            cv2.rectangle(image, (x, y), (x + w, y + h), G, 2)
+            #cv2.rectangle(image, (x, y), (x + w, y + h), G, 2)
             print('found qr code')
            
     else: # Found qr code in normal image
-        cv2.rectangle(image, (x, y), (x + w, y + h), G, 2)
+        #cv2.rectangle(image, (x, y), (x + w, y + h), G, 2)
         print('found qr code')
         
     
@@ -109,13 +109,13 @@ def qrcodefunction(res):
     
     if x + (w/2) > mid + delta or x + (w/2) < mid - delta: 
         if x == 0: # No qr code found
-            print('')
+            #print('')
             print('')
         else: # qr code found outside the middle area
-            cv2.circle(image, (x + int(round(w/2)), y + int(round(h/2))), 5, R, -1)
+            #cv2.circle(image, (x + int(round(w/2)), y + int(round(h/2))), 5, R, -1)
             print('outside the area')
     else: # qr code found inside the middle area
-        cv2.circle(image, (x + int(round(w/2)), y + int(round(h/2))), 5, G, -1)
+        #cv2.circle(image, (x + int(round(w/2)), y + int(round(h/2))), 5, G, -1)
         print('Inside the area')
 
     distance = 0
