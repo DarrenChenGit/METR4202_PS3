@@ -309,7 +309,3 @@ def middlearea(image, res, delta):
 #def main():
  #   image = getimage(res)
   #  qrcodefunction(image)
-
-#while True:
- #   main()
-  #  time.sleep(2)
