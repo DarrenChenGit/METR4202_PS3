@@ -26,7 +26,7 @@ class State(enum.Enum):
     Returning = 2
 
 class myRobot:
-    def __init__(self, turn, x_size = 200, y_size = 200, speed = 2, turnSpeed = 8, orientation = 90):
+    def __init__(self, turn, x_size = 200, y_size = 200, speed = 2, turnSpeed = 6, orientation = 90):
         self.x = int(x_size/2)
         self.y = int(20)
         self.orientation = orientation #Orientation w.r.t to world coordinates.
@@ -57,23 +57,35 @@ class myRobot:
         return (self.x, self.y, self.orientation)
         
 #MOVEMENT FUNCTIONS
-
     #Integrated function that uses Motors and Map to update location.
     #Convention:
     #+Angle - Right turn.
     #-Angle - Left turn.
     def turn_robot(self, degrees):
-        #delay = ((2 * m.pi * 8) * (abs(degrees)/360)) / self.turnSpeed 
+        if abs(degrees) > 180:
+            degrees = (degrees - 360) * (degrees/abs(degrees))
+            if abs(degrees) >= 160:
+                for x in range (0,180,10):
+                    self.turn_robot(10)
+                self.face_objective()
+                return None
+            
+        delay = ((2 * m.pi * 8) * (abs(degrees)/360)) / self.turnSpeed 
         self.orientation -= degrees
         if run:
             if abs(degrees) <= 10:
-                degrees = degrees * 1.5
+                degrees = degrees * 1.1
 
             if  45 <= int(abs(degrees)) <= 90:
                 degrees = degrees * .95
+
+            #Slower turn because tracks may come off.
+            
+                
                 
             Motors.turnDegrees(int(degrees), self.turnSpeed)
-            time.sleep(0.7)
+            time.sleep(0.7 + delay)
+            
 
         #We can calibrate the stuff.
         #Mark the robot position.
@@ -84,25 +96,11 @@ class myRobot:
         # destX = self.x + distance * m.cos(m.radians(self.orientation))
         # destY = self.y + distance * m.sin(m.radians(self.orientation))
         Motors.moveDistance(distance)
-        time.sleep(3)
+        time.sleep(abs(distance/15))
         self.update_position(distance, self.orientation)
         self.map.mark_robot_pos(self.x , self.y, self.orientation)
 
-    def ir_pass(self, turn):
-        if turn == 1: #left
-            while IR.readLeft() < 15:
-                #if Ultrasonic.read() > 7:
-                #    self.move_forward(2)
-                self.move_forward(3)
-            self.move_forward(10)
-            
-        elif turn == 2:
-            while IR.readRight() < 15:
-            #    if Ultrasonic.read() > 7:
-                self.move_forward(3)
-            self.move_forward(10)
-
-    #Avoid an obstacle by turning left/right then moving away.
+        #Avoid an obstacle by turning left/right then moving away.
     def avoid_obstacle(self):
        while(1):
         direction = self.get_turn_priority()
@@ -123,7 +121,7 @@ class myRobot:
                 while Ultrasonic.read() > 5:
                     self.move_forward(2)
                     a = a + 2
-                    if a >= 10:
+                    if a >= 15:
                         return
                 return
             self.move_forward(2)
@@ -175,30 +173,29 @@ class myRobot:
     # results = [distance, dif, QR_Center, min, max]
         dif = results[1]
         qrcentre = results[2]
+        angleToTurn = dif / 29 #Estimation
+        self.face_objective()
         #While the distance not = 0, when we cant find QR the distance returned by function is 0.
-        while results[0] != 0:
-            results = thing.increase_Bri(res)
-            if results[0] == 0:
-                break
-            else:
-                time.sleep(2)
-                qrcentre = int(results[2])
+        # while results[0] != 0:
+        #     results = thing.qrcodefunction(res)
+        #     time.sleep(2)
+        #     qrcentre = int(results[2])
 
             
-            if qrcentre > (mid+delta):
-                self.turn_robot(5)
+        #     if qrcentre > (mid+delta):
+        #         self.turn_robot(5)
                 
 
-            elif qrcentre < (mid-delta):
-                self.turn_robot(-5)
+        #     elif qrcentre < (mid-delta):
+        #         self.turn_robot(-5)
 
-            else:
-                x = self.x + results[0] * m.cos(m.radians(self.orientation))
-                y = self.y + results[0] * m.sin(m.radians(self.orientation))
-                self.dest = [int(round(x)), int(round(y))]
-                print("Dest is ", int(x), int(y))
-                self.QRFound = True #We found QR.
-                break
+        #     else:
+        #         x = self.x + results[0] * m.cos(m.radians(self.orientation))
+        #         y = self.y + results[0] * m.sin(m.radians(self.orientation))
+        #         self.dest = [int(round(x)), int(round(y))]
+        #         print("Dest is ", int(x), int(y))
+        #         self.QRFound = True #We found QR.
+        #         break
 
 #MAPPING FUNCTIONS
     def update_position(self, distance, orientation):
@@ -218,6 +215,8 @@ class myRobot:
     def sweep(self, coneAngle = 50, increment = 5):
         #Turn left 90 degrees. Then start the sweep.
         self.turn_robot(int(-coneAngle/2))
+        if (not self.QRFound):
+            self.QR_scan()
         
        
         distance = 0
@@ -228,21 +227,20 @@ class myRobot:
             #We hit the maximum angle.
             if angle >= coneAngle:
                 #If we found QR at the right edge of cone.
+            
+                #Break only if we found it.
                 if (not self.QRFound):
-                    #Break only if we found it.
-                    if (self.QR_scan()):
-                        break
-                
-                self.turn_robot(int(-angle/2))
-                
+                    self.QR_scan()
+                self.turn_robot(-coneAngle/2)
                 break
             #Read ultrasound.
             distance = Ultrasonic.read() + 6
 
-            #If we havent found QR. Try.
-            if (not self.QRFound):
-                self.QR_scan()
-                
+            #Look for QR constantly.
+            # if (self.state != State.Returning):
+            #     self.QR_scan()
+            if angle == coneAngle/2:
+                self.QR_scan()    
             if (distance <= 40):
                 if (skip_set == 0):
                     self.obstacles.append(self.map.mark_relative_location(self.x, self.y, distance, self.orientation, 2))
@@ -331,7 +329,9 @@ class myRobot:
     def cont_move(self):
         #Face objective and sweep.
         self.face_objective()
-        self.sweep(150, 50)
+        self.sweep(60, 10)
+        self.face_objective()
+        
 
         #Returning after yeeting the QR flag.
         if (self.state == State.Returning):
@@ -346,17 +346,14 @@ class myRobot:
                 
         
         #If we find the QR and we are within some range, we can ram.
-        elif (self.is_near_destination()):
-            if (not self.QRFound):
-                self.sweep(270, 30)
-
-            else:
-                #ATTACK
-                print("Attacking objective...")
-                self.face_objective()
-                self.QR_scan()
-                self.move_forward(self.get_dest_distance())
-                self.state = State.Returning
+        elif (self.is_near_destination() and self.QRFound):
+         
+            #ATTACK
+            print("Attacking objective...")
+            self.face_objective()
+            self.move_forward(self.get_dest_distance() - 7)
+            self.state = State.Returning
+            return False
         
         
         D = R.check_collision()
@@ -366,7 +363,7 @@ class myRobot:
             self.avoid_obstacle()       
 
         else:
-            self.move_forward(25)
+            self.move_forward(30)
 
         return False
 
@@ -380,10 +377,18 @@ class myRobot:
     #Scan for a QR code and try to align to it. Returns true if found,
     #else returns false for no QR.
     def QR_scan(self):
-        code = thing.increase_Bri(res)
+        code = thing.qrcodefunction(res)
         if code[0] != 0:
             # self.map.mark_location(self.dest[0],self.dest[1],4)
-            self.move_cam_to_mid(code)
+            dif = code[1]
+            angleToTurn = (dif+49) / 22.5 #Estimation
+            print("Angle to turn:", angleToTurn)
+            x = self.x + code[0] * m.cos(m.radians(self.orientation - angleToTurn))
+            y = self.y + code[0] * m.sin(m.radians(self.orientation - angleToTurn))
+            print("Dest set to", x, y)
+            self.dest = [x,y]
+            self.QRFound = True
+            #self.move_cam_to_mid(code)
             return True
 
         return False
@@ -415,5 +420,5 @@ if (run):
             rc.disarm
             break
             print("All done")
-        time.sleep(2)
+        time.sleep(1)
         
