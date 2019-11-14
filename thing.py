@@ -18,8 +18,8 @@ res = (1280,720)
 # Image needed to do comparing
 # TO DO FEATURE MATCHING YOU NEED TO INSTALL OPENCV-CONTRIB-PYTHON
 # PIP3 INSTALL OPENCV-CONTRIB-PYTHON==3.4.2.16
-qrcode = cv2.imread('qrcode.png')
-img1 = cv2.cvtColor(qrcode, cv2.COLOR_BGR2GRAY)
+#qrcode = cv2.imread('qrcode.png')
+#img1 = cv2.cvtColor(qrcode, cv2.COLOR_BGR2GRAY)
 
 delta = 200
 mid = int(res[0]/2)
@@ -53,6 +53,7 @@ def adbinarize(image):
     binary = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,115,1)
     return binary
 
+'''
 def featurematching(res):
     
     if res[0] == 1920:
@@ -82,7 +83,7 @@ def featurematching(res):
     # No. of matches between images
     print(len(matches))
     return(len(matches))
-
+'''
 def qrcodefunction(res):
     
     if res[0] == 1920:
