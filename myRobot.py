@@ -11,7 +11,7 @@ res = (1920,1080)
 #res = (1280,720)
 #res = (640,480)
 
-delta = 50
+delta = 100
 mid = int(res[0]/2)
 
 
@@ -26,7 +26,7 @@ class State(enum.Enum):
     Returning = 2
 
 class myRobot:
-    def __init__(self, turn, x_size = 200, y_size = 200, speed = 2, turnSpeed = 4, orientation = 90):
+    def __init__(self, turn, x_size = 200, y_size = 200, speed = 2, turnSpeed = 8, orientation = 90):
         self.x = int(x_size/2)
         self.y = int(21)
         self.orientation = orientation #Orientation w.r.t to world coordinates.
@@ -36,7 +36,7 @@ class myRobot:
         self.map = Map(x_size, y_size)
         self.map.mark_robot_pos(self.x,self.y,orientation)
         self.state = State.Explore
-        self.dest = [90,195]
+        self.dest = [100,195]
         self.obstacles = []
         self.QRFound = False
         self.turn_state = 0
@@ -66,10 +66,13 @@ class myRobot:
         delay = ((2 * m.pi * 8) * (abs(degrees)/360)) / self.turnSpeed 
         self.orientation -= degrees
         if run:
-            if abs(degrees) == 5:
-                degrees = degrees*1.2
+            if abs(degrees) <= 10:
+                degrees = degrees * 1.5
+
+            if int(abs(degrees)) == 90:
+                degrees = degrees * .95
             Motors.turnDegrees(int(degrees), self.turnSpeed)
-            time.sleep(delay + 0.4)
+            time.sleep(delay + 0.5)
 
         #We can calibrate the stuff.
         #Mark the robot position.
@@ -91,21 +94,13 @@ class myRobot:
                 #    self.move_forward(2)
                 self.move_forward(3)
             self.move_forward(10)
-            #x = 0
-            #while x < 10:
-            #    if Ultrasonic.read() < 7:
-            #        self.move_forward(2)
-            #        x = x+2
+            
         elif turn == 2:
             while IR.readRight() < 15:
             #    if Ultrasonic.read() > 7:
                 self.move_forward(3)
             self.move_forward(10)
-            #x = 0
-            #while x < 10:
-            #    if Ultrasonic.read() < 7:
-            #        self.move_forward(2)
-            #        x = x+2
+            
 
 
     #Avoid an obstacle by turning left/right then moving away.
@@ -127,7 +122,7 @@ class myRobot:
                 a = 0
                 while Ultrasonic.read() > 5:
                     self.move_forward(2)
-                    a = a +2
+                    a = a + 2
                     if a >= 10:
                         return
                 return
@@ -177,7 +172,7 @@ class myRobot:
 
     def move_cam_to_mid(self, results):
     # move camera to position rover straight at qrcode
-    # results = [dis,dif,qrcen,min,max]
+    # results = [distance, dif, QR_Center, min, max]
         dif = results[1]
         qrcentre = results[2]
         #minrange = results[3]
@@ -185,6 +180,9 @@ class myRobot:
         while 1:
             results = thing.qrcodefunction(res)
             qrcentre = results[2]
+            if results[0] == 0:
+                break
+            
             if qrcentre > mid+delta:
                 self.turn_robot(7)
                 
@@ -193,36 +191,13 @@ class myRobot:
                 self.turn_robot(-7)
 
             else:
-                x = self.x + results[0] * m.cos(self.orientation)
-                y = self.y + results[0] * m.sin(self.orientation)
-                self.dest = [x, y]
+                x = self.x + results[0] * m.cos(m.radians(self.orientation))
+                y = self.y + results[0] * m.sin(m.radians(self.orientation))
+                self.dest = [int(x), int(y)]
+                print("Dest is ", int(x), int(y))
+                self.QRFound = True #We found QR.
                 break
-##        if results[1] > 0: # qrcentre is left side of camera
-##            while qrcentre > mid+delta: # qrcentre outside mid area
-##                print('Want to turn left')
-##                self.turn_robot(10) # Left turn
-##                results = thing.qrcodefunction(res)
-##                qrcentre = results[2]
-##                x = self.x + results[0] * m.cos(self.orientation)
-##                y = self.y + results[0] * m.sin(self.orientation)
-##                self.dest = [x, y]
-##                
-##        elif results[1] < 0 : # qrcentre is right side of camera
-##            while qrcentre < mid-delta: # qrcentre outside mid area
-##                self.turn_robot(-10) # Right turn
-##                results = thing.qrcodefunction(res)
-##                qrcentre = results[2]
-##                x = self.x + results[0]*m.cos(self.orientation)
-##                y = self.y + results[0]*m.sin(self.orientation)
-##                self.dest = [x, y]
-##                
-##        else: # No qr code
-##            return None
-##        
-##        if mid - delta < qrcentre < mid + delta:
-##            dis = results[0]
-##            R.move_forward(dis/2)
-            
+
 #MAPPING FUNCTIONS
     def update_position(self, distance, orientation):
         angle_rad = m.radians(orientation)
@@ -243,7 +218,7 @@ class myRobot:
         #Check if the robot is within a size 10(note size = 5 * 2) square of the objective.
         return self.map.is_point_in_sqr_radius(self.dest[0], self.dest[1], self.x, self.y, 20)
 
-    def sweep(self, increment = 5, coneAngle = 50):
+    def sweep(self, coneAngle = 50, increment = 5):
         #Turn left 90 degrees. Then start the sweep.
         self.turn_robot(-coneAngle/2)
         if (not self.QRFound):
@@ -256,18 +231,10 @@ class myRobot:
         while 1:
             #We hit the maximum angle.
             if angle >= coneAngle:
+                self.turn_robot(-coneAngle/2)
                 break
             
             distance = Ultrasonic.read() + 6
-            #if (not self.QRFound):
-            #    image = thing.getimage((1920, 1088))
-            #    QR_dist = thing.qrcodefunction(image)
-            #    #For testing please remove later.
-            #    self.move_forward(QR_dist - 10)
-            #    if (QR_dist):
-            #        self.QRFound = True
-            
-            index = int(angle/increment)
             if (distance <= 40):
                 if (skip_set == 0):
                     self.obstacles.append( self.map.mark_relative_location(self.x, self.y, distance, self.orientation, 2))
@@ -347,28 +314,11 @@ class myRobot:
 
         return angle
 
-        #if (leftReading > 10):
-        #    self.turn = Turn.Left
-        #    self.turn_robot(-90)
-        #    self.move_forward(leftReading/2)
-        
-        #elif (rightReading > 10):
-        #    self.turn = Turn.Right
-        #    self.turn_robot(90)
-        #    self.move_forward(rightReading/2)
-        
-        #else:
-        #    #We might wanna reverse.
-        #    self.move_forward(-10)
-
-    
-
-
     #Continuous move.
     def cont_move(self):
         #Face objective and sweep.
         self.face_objective()
-        self.sweep()
+        self.sweep(80)
         if (self.state == State.Returning):
             print("Now returning")
             self.dest = [self.map.x_length/2, 20]
@@ -403,7 +353,7 @@ class myRobot:
         if code:
             # self.map.mark_location(self.dest[0],self.dest[1],4)
             self.move_cam_to_mid(code)
-            self.QRFound = True #We found QR.
+            
 
     def move_to_objective(self):
         return 0
@@ -426,10 +376,8 @@ R = myRobot(Turn.Left)
 if (run):
     
     rc = RoverController()
-    rc.setReadTimeout(10)
+    #rc.setReadTimeout(10)
     rc.connectIP()
     
     while 1:
-##        R.QR_scan()
-##        time.sleep(3)
         R.cont_move()
