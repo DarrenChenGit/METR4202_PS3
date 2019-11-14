@@ -67,11 +67,26 @@ def qrcodefunction(res):
     h = 0
 
     # camera calibration
+    # 1920x1080
     knownwidth = 7.5 #cm
     knowndistance = 108 #cm
     knowpixelwidth = 128 # pixel Height
-    focal = (knowpixelwidth*knowndistance)/knownwidth
+    focal1080p = (knowpixelwidth*knowndistance)/knownwidth
+    # 1280x720
+    knowndistance640p = 30
+    knownpixelheight640p = 167 
+    focal640p = (knownpixelheight640p*knowndistance640p)/knownwidth
+    # 620x480
+    knowndis720p = 45
+    knwonpixh720p = 219
+    focal720p = (knwonpixh720p*knowndis720p)/knownwidth
 
+    if res[0] == 1920:
+        focal = focal1080p
+    if res[0] == 1280:
+        focal = focal720p
+    if res[0] == 640:    
+        focal = focal640p
     # binary image
     gray = grayscale(image)
     bi = adbinarize(gray)
