@@ -6,12 +6,12 @@ import thing
 from map import Map
 from micromelon import *
 
-run = 1
-res = (1920,1080)
-#res = (1280,720)
+run = 0
+#res = (1920,1080)
+res = (1280,720)
 #res = (640,480)
 
-delta = 100
+delta = 120
 mid = int(res[0]/2)
 
 
@@ -28,7 +28,7 @@ class State(enum.Enum):
 class myRobot:
     def __init__(self, turn, x_size = 200, y_size = 200, speed = 2, turnSpeed = 8, orientation = 90):
         self.x = int(x_size/2)
-        self.y = int(21)
+        self.y = int(20)
         self.orientation = orientation #Orientation w.r.t to world coordinates.
         self.speed = speed #How fast robot move forward/backward
         self.turnSpeed = turnSpeed #How fast robot should turn.
@@ -63,17 +63,17 @@ class myRobot:
     #+Angle - Right turn.
     #-Angle - Left turn.
     def turn_robot(self, degrees):
-        delay = ((2 * m.pi * 8) * (abs(degrees)/360)) / self.turnSpeed 
+        #delay = ((2 * m.pi * 8) * (abs(degrees)/360)) / self.turnSpeed 
         self.orientation -= degrees
         if run:
             if abs(degrees) <= 10:
                 degrees = degrees * 1.5
 
-            if int(abs(degrees)) == 90:
+            if  45 <= int(abs(degrees)) <= 90:
                 degrees = degrees * .95
                 
             Motors.turnDegrees(int(degrees), self.turnSpeed)
-            time.sleep(delay + 0.8)
+            time.sleep(0.7)
 
         #We can calibrate the stuff.
         #Mark the robot position.
@@ -116,6 +116,7 @@ class myRobot:
             self.move_forward(-15)
             self.get_turn_priority()
         
+        #Keep moving forward until IR sensor is > 25
         while Ultrasonic.read() > 5:
             if self.IR_read(sensor) > 10:
                 a = 0
@@ -174,8 +175,6 @@ class myRobot:
     # results = [distance, dif, QR_Center, min, max]
         dif = results[1]
         qrcentre = results[2]
-        #minrange = results[3]
-        #maxrange = results[4]
         #While the distance not = 0, when we cant find QR the distance returned by function is 0.
         while results[0] != 0:
             results = thing.qrcodefunction(res)
@@ -193,7 +192,7 @@ class myRobot:
             else:
                 x = self.x + results[0] * m.cos(m.radians(self.orientation))
                 y = self.y + results[0] * m.sin(m.radians(self.orientation))
-                self.dest = [int(x), int(y)]
+                self.dest = [int(round(x)), int(round(y))]
                 print("Dest is ", int(x), int(y))
                 self.QRFound = True #We found QR.
                 break
@@ -208,21 +207,15 @@ class myRobot:
         self.orientation = orientation
         self.map.mark_location(self.x, self.y, 1)
 
-    def determine_turn(self):
-        #TO be filled
-        #IR Clearance to be around 8 at minimum.
-        return Turn.Left
-
     #Is the robot near its destination?
     def is_near_destination(self):
         #Check if the robot is within a size 10(note size = 5 * 2) square of the objective.
-        return self.map.is_point_in_sqr_radius(self.dest[0], self.dest[1], self.x, self.y, 70)
+        return self.map.is_point_in_sqr_radius(self.dest[0], self.dest[1], self.x, self.y, int(60))
 
     def sweep(self, coneAngle = 50, increment = 5):
         #Turn left 90 degrees. Then start the sweep.
-        self.turn_robot(-coneAngle/2)
-        if (not self.QRFound):
-            self.QR_scan()
+        self.turn_robot(int(-coneAngle/2))
+        
        
         distance = 0
         angle = 0
@@ -237,15 +230,21 @@ class myRobot:
                     if (self.QR_scan()):
                         break
                 
-                self.turn_robot(-coneAngle/2)
+                self.turn_robot(int(-angle/2))
+                
                 break
-            
+            #Read ultrasound.
             distance = Ultrasonic.read() + 6
+
+            #If we havent found QR. Try.
+            if (not self.QRFound):
+                self.QR_scan()
+                
             if (distance <= 40):
                 if (skip_set == 0):
-                    self.obstacles.append( self.map.mark_relative_location(self.x, self.y, distance, self.orientation, 2))
-                    self.turn_robot(5)
-                    angle = angle +5
+                    self.obstacles.append(self.map.mark_relative_location(self.x, self.y, distance, self.orientation, 2))
+                    self.turn_robot(increment)
+                    angle = angle + increment
                 else:
                     skip_set = 0
                     error = self.map.cone_error(self.x, self.y,self.orientation,skip_angle-increment)
@@ -263,14 +262,12 @@ class myRobot:
                 for x in error:
                     if x in self.obstacles:
                         self.obstacles.remove(x)
-                self.turn_robot(5)
+                self.turn_robot(increment)
                
                 angle = angle + increment
                 skip_set = 1
 
             #R.map.display_map()
-        if (not self.QRFound):
-            self.QR_scan()
 
     #Sweep using the left IR sensor.
     def ir_sweep(self, coneAngle, increment):
@@ -331,7 +328,7 @@ class myRobot:
     def cont_move(self):
         #Face objective and sweep.
         self.face_objective()
-        self.sweep(80)
+        self.sweep(150, 50)
 
         #Returning after yeeting the QR flag.
         if (self.state == State.Returning):
@@ -346,13 +343,17 @@ class myRobot:
                 
         
         #If we find the QR and we are within some range, we can ram.
-        elif (self.QRFound and self.is_near_destination()):
-            #ATTACK
-            print("Attacking objective...")
-            self.face_objective()
-            self.QR_scan()
-            self.move_forward(self.get_dest_distance())
-            self.state = State.Returning
+        elif (self.is_near_destination()):
+            if (not self.QRFound):
+                self.sweep(270, 30)
+
+            else:
+                #ATTACK
+                print("Attacking objective...")
+                self.face_objective()
+                self.QR_scan()
+                self.move_forward(self.get_dest_distance())
+                self.state = State.Returning
         
         
         D = R.check_collision()
@@ -404,11 +405,15 @@ if (run):
     rc = RoverController()
     #rc.setReadTimeout(10)
     rc.connectIP()
-    
-    while 1:
-        if (R.cont_move()):
-            rc.disarm
-            break
-            print("All done")
+    while (1):
+        thing.qrcodefunction(res)
         time.sleep(2)
+    
+    
+##    while 1:
+##        if (R.cont_move()):
+##            rc.disarm
+##            break
+##            print("All done")
+##        time.sleep(2)
         
