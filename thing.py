@@ -15,6 +15,11 @@ from micromelon import *
 res = (1280,720)
 #res = (640,480)
 
+# Image needed to do comparing
+# TO DO FEATURE MATCHING YOU NEED TO INSTALL OPENCV-CONTRIB-PYTHON
+# PIP3 INSTALL OPENCV-CONTRIB-PYTHON==3.4.2.16
+qrcode = cv2.imread('qrcode.png')
+img1 = cv2.cvtColor(qrcode, cv2.COLOR_BGR2GRAY)
 
 delta = 200
 mid = int(res[0]/2)
@@ -47,6 +52,36 @@ def binarize(image, ret):
 def adbinarize(image):
     binary = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,115,1)
     return binary
+
+def featurematching(res):
+    
+    if res[0] == 1920:
+        image = Robot.getImageCapture(IMRES.R1920x1088)
+    if res[0] == 1280:
+        image = Robot.getImageCapture(IMRES.R1280x720)
+    if res[0] == 640:    
+        image = Robot.getImageCapture(IMRES.R640x480)
+    image = image.astype(numpy.uint8)
+    
+    img2 = grayscale(image)
+
+    # SIFT
+    #FOR THIS TO WORK YOU NEED TO INSTALL OPENCV-CONTRIB-PYTHON
+    # PIP3 INSTALL OPENCV-CONTRIB-PYTHON==3.4.2.16
+    sift = cv2.xfeatures2d.SIFT_create()
+
+    keypoints_1, descriptors_1 = sift.detectAndCompute(img1,None)
+    keypoints_2, descriptors_2 = sift.detectAndCompute(img2,None)
+
+    #feature matching
+    bf = cv2.BFMatcher(cv2.NORM_L1, crossCheck=True)
+
+    matches = bf.match(descriptors_1,descriptors_2)
+    matches = sorted(matches, key = lambda x:x.distance)
+    
+    # No. of matches between images
+    print(len(matches))
+    return(len(matches))
 
 def qrcodefunction(res):
     
