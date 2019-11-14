@@ -6,12 +6,12 @@ import thing
 from map import Map
 from micromelon import *
 
-run = 0
+run = 1
 #res = (1920,1080)
 res = (1280,720)
 #res = (640,480)
 
-delta = 120
+delta = 200
 mid = int(res[0]/2)
 
 
@@ -177,17 +177,20 @@ class myRobot:
         qrcentre = results[2]
         #While the distance not = 0, when we cant find QR the distance returned by function is 0.
         while results[0] != 0:
-            results = thing.qrcodefunction(res)
-            time.sleep(2)
-            qrcentre = int(results[2])
+            results = thing.increase_Bri(res)
+            if results[0] == 0:
+                break
+            else:
+                time.sleep(2)
+                qrcentre = int(results[2])
 
             
             if qrcentre > (mid+delta):
-                self.turn_robot(7)
+                self.turn_robot(5)
                 
 
             elif qrcentre < (mid-delta):
-                self.turn_robot(-7)
+                self.turn_robot(-5)
 
             else:
                 x = self.x + results[0] * m.cos(m.radians(self.orientation))
@@ -377,7 +380,7 @@ class myRobot:
     #Scan for a QR code and try to align to it. Returns true if found,
     #else returns false for no QR.
     def QR_scan(self):
-        code = thing.qrcodefunction(res)
+        code = thing.increase_Bri(res)
         if code[0] != 0:
             # self.map.mark_location(self.dest[0],self.dest[1],4)
             self.move_cam_to_mid(code)
@@ -405,15 +408,12 @@ if (run):
     rc = RoverController()
     #rc.setReadTimeout(10)
     rc.connectIP()
-    while (1):
-        thing.qrcodefunction(res)
+    
+    
+    while 1:
+        if (R.cont_move()):
+            rc.disarm
+            break
+            print("All done")
         time.sleep(2)
-    
-    
-##    while 1:
-##        if (R.cont_move()):
-##            rc.disarm
-##            break
-##            print("All done")
-##        time.sleep(2)
         

@@ -147,7 +147,7 @@ def qrcodefunction(res):
         qrcentre = x + w/2
         distance = (knownwidth*focal)/h
         results = [distance,dif,qrcentre,mid-delta,mid+delta]
-        print('mid point of qr code =', x+(w/2))
+        print('mid point of qr code =', x + (w/2))
         print('horizontal distance from center = ',dif)
         #print('x =', x)
         #print('y =', y)
