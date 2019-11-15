@@ -205,11 +205,12 @@ def qrcodefunction(res):
     
     if x + (w/2) > mid + delta or x + (w/2) < mid - delta: 
         if x == 0: # No qr code found
-            print('')
-            print('')
+            print("No QR Found :(")
+            
         else: # qr code found outside the middle area
             #cv2.circle(image, (x + int(round(w/2)), y + int(round(h/2))), 5, R, -1)
             print('outside the area')
+            
     else: # qr code found inside the middle area
         #cv2.circle(image, (x + int(round(w/2)), y + int(round(h/2))), 5, G, -1)
         print('Inside the area')
@@ -220,19 +221,19 @@ def qrcodefunction(res):
     results = [distance,dif,qrcentre,mid-delta,mid+delta]
                
     if h == 0:
-        print('')
+        #print('No QR :(')
         return results #[0,-res/2,0,mid-delta,mid+delta]
     else:
         qrcentre = x + w/2
         distance = (knownwidth*focal)/h
-        results = [distance,dif,qrcentre,mid-delta,mid+delta]
-        print('mid point of qr code =', x+(w/2))
-        print('horizontal distance from center = ',dif)
+        results = [distance, dif, qrcentre, mid-delta, mid + delta]
+        #print('mid point of qr code =', x+(w/2))
+        #print('horizontal distance from center = ',dif)
         #print('x =', x)
         #print('y =', y)
         #print('w =', w)
         #print('h =', h)
-        print('qr code distance =', distance)
+        print('QR code distance = ', distance)
         #print('')
         #print('')
         #print('')
